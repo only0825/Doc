@@ -10,6 +10,14 @@ import java.nio.channels.FileChannel;
 @Slf4j // Slf4j这个是日志记录器
 public class TestByteBuffer {
 
+    /*
+        ByteBuffer 正确使用姿势
+        1. 向 buffer 写入数据，例如调用 channel.read(buffer)
+        2. 调用 flip() 切换至**读模式**
+        3. 从 buffer 读取数据，例如调用 buffer.get()
+        4. 调用clear() 或 compact() 切换至**写模式**
+        5. 重复 1~4 步骤
+     */
     public static void main(String[] args) {
         // FileChannel
         // 1. 输入输出流   2. RandomAccessFile
@@ -31,7 +39,7 @@ public class TestByteBuffer {
                 }
                 buffer.clear(); // 切换为写模式
             }
-        } catch (IOException e) {
+        } catch (IOException ignored) {
         }
     }
 }
