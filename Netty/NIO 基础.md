@@ -241,27 +241,27 @@ position: [0], limit: [4]
 #### 字符串与 ByteBuffer 互转
 
 ```java
-        // 字符串转为 ByteBuffer 3种方法
-        // 1. 原始方法
-        ByteBuffer buffer1 = ByteBuffer.allocate(16);
-        buffer1.put("hello".getBytes());
-        debugAll(buffer1);
-        // 2. Charset
-        ByteBuffer buffer2 = StandardCharsets.UTF_8.encode("hello"); // 会自动转为
-        debugAll(buffer2);
-        // 3. wrap
-        ByteBuffer buffer3 = ByteBuffer.wrap("hello".getBytes());
-        debugAll(buffer3);
+// 字符串转为 ByteBuffer 3种方法
+// 1. 原始方法
+ByteBuffer buffer1 = ByteBuffer.allocate(16);
+buffer1.put("hello".getBytes());
+debugAll(buffer1);
+// 2. Charset
+ByteBuffer buffer2 = StandardCharsets.UTF_8.encode("hello"); // 会自动转为
+debugAll(buffer2);
+// 3. wrap
+ByteBuffer buffer3 = ByteBuffer.wrap("hello".getBytes());
+debugAll(buffer3);
 
 
-        // ByteBuffer 转字符串
-        // 2 和 3 都是直接切换到读模式 再转可以不用filp()切换到读模式
-        String str1 = StandardCharsets.UTF_8.decode(buffer2).toString();
-        System.out.println(str1);
-        // 1方法再转就要用filp()转成读模式
-        buffer1.flip();
-        String str2 = StandardCharsets.UTF_8.decode(buffer1).toString();
-        System.out.println(str2);
+// ByteBuffer 转字符串
+// 2 和 3 都是直接切换到读模式 再转可以不用filp()切换到读模式
+String str1 = StandardCharsets.UTF_8.decode(buffer2).toString();
+System.out.println(str1);
+// 1方法再转就要用filp()转成读模式
+buffer1.flip();
+String str2 = StandardCharsets.UTF_8.decode(buffer1).toString();
+System.out.println(str2);
 ```
 
 
@@ -336,7 +336,7 @@ position: [0], limit: [5]
 思路：
 
 1. 三个ByteBuffer组合到一个大的ByteBuffer中，涉及到数据到多次拷贝
-2. 三个ByteBuffer组合到一起，以一个整体写入
+2. 三个ByteBuffer组合到一起，以一个整体写入（集中写）
 
 
 
@@ -427,5 +427,320 @@ try (FileChannel channel = new RandomAccessFile("words2.txt", "rw").getChannel()
         // 切换为写模式，但是缓冲区可能未读完，这里需要使用compact
         source.compact();
     }
+```
+
+
+
+## 3. 文件编程
+
+重点是网络编程，文件编程只了解即可
+
+### 3.1 FileChannel
+
+#### :warning: 注意
+
+> FileChannel 只能工作再阻塞模式下  不能配合Selector
+
+
+
+#### 获取
+
+不能直接打开 FileChannel，**必须**通过 FileInputStream、FileOutputStream 或者 RandomAccessFile 来获取 FileChannel，它们都有 getChannel 方法
+
+- 通过 FileInputStream 获取的 channel **只能读**
+- 通过 FileOutputStream 获取的 channel **只能写**
+- 通过 RandomAccessFile 是否能读写**根据构造 RandomAccessFile 时的读写模式决定**
+
+
+
+#### 读取
+
+会从 channel 读取数据填充 ByteBuffer，返回值表示读到了多少字节，-1 表示到达了文件的末尾
+
+```java
+int readBytes = channel.read(buffer)
+```
+
+
+
+#### 写入
+
+因为channel也是有大小的，所以 write 方法并不能保证一次将 buffer 中的内容全部写入 channel。必须**需要按照以下规则进行写入**
+
+```java
+// 通过hasRemaining()方法查看缓冲区中是否还有数据未写入到通道中
+while(buffer.hasRemaining()) {
+	channel.write(buffer);
+}
+```
+
+
+
+#### 关闭
+
+channel必须关闭，一般情况通过try-with-resource进行关闭。
+
+调用了 FileInputStream、FileOutputStream 或者 RandomAccessFile 的 close 方法会间接的调用 channel 的 close 方法
+
+
+
+#### 位置
+
+**position**
+
+channel也拥有一个保存读取数据位置的属性，即position
+
+```java
+long pos = channel.position();
+```
+
+可以通过position(int pos)设置channel中position的值
+
+```java
+long newPos = ...;
+channel.position(newPos);
+```
+
+设置当前位置时，如果设置为文件的末尾
+
+- 这时读取会返回 -1
+- 这时写入，会追加内容，但要注意如果 position 超过了文件末尾，再写入时在新内容和原末尾之间会有空洞（00）
+
+
+
+#### 大小
+
+使用 size() 方法获取文件的大小
+
+
+
+#### 强制写入
+
+操作系统出于性能的考虑，会将数据缓存，不是立刻写入磁盘，而是等到缓存满了以后将所有数据一次性的写入磁盘。可以调用 **force(true)** 方法将文件内容和元数据（文件的权限等信息）立刻写入磁盘
+
+
+
+### 3.2 两个 Channel 传输数据
+
+transferTo 方法，大小限制2G，但可以多次传输
+
+```java
+        try (
+                FileChannel from = new FileInputStream("data.txt").getChannel();
+                FileChannel to = new FileOutputStream("to.txt").getChannel();
+        ) {
+            // 效率高，底层会利用操作系统的零拷贝进行优化, 有2G数据限制
+            long size = from.size();
+            // left 变量代表还剩余多少字节
+            for (long left = size; left > 0; ) {
+                System.out.println("position:" + (size - left) + " left:" + left);
+                left -= from.transferTo((size - left), left, to);
+            }
+            from.transferTo(0, from.size(), to);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+```
+
+### 3.3 Path
+
+- Path 用来表示文件路径
+- Paths 是工具类，用来获取 Path 实例
+
+```
+Path source = Paths.get("1.txt"); // 相对路径 不带盘符 使用 user.dir 环境变量来定位 1.txt
+
+Path source = Paths.get("d:\\1.txt"); // 绝对路径 代表了  d:\1.txt 反斜杠需要转义
+
+Path source = Paths.get("d:/1.txt"); // 绝对路径 同样代表了  d:\1.txt
+
+Path projects = Paths.get("d:\\data", "projects"); // 代表了  d:\data\projectsCopy
+```
+
+- `.` 代表了当前路径
+- `..` 代表了上一级路径
+
+例如目录结构如下
+
+```
+d:
+	|- data
+		|- projects
+			|- a
+			|- bCopy
+```
+
+代码
+
+```
+Path path = Paths.get("d:\\data\\projects\\a\\..\\b");
+System.out.println(path);
+System.out.println(path.normalize()); // 正常化路径 会去除 . 以及 ..Copy
+```
+
+输出结果为
+
+```
+d:\data\projects\a\..\b
+d:\data\projects\bCopy
+```
+
+### 3.4 Files
+
+#### 查找
+
+检查文件是否存在
+
+```
+Path path = Paths.get("helloword/data.txt");
+System.out.println(Files.exists(path));Copy
+```
+
+#### 创建
+
+创建**一级目录**
+
+```
+Path path = Paths.get("helloword/d1");
+Files.createDirectory(path);Copy
+```
+
+- 如果目录已存在，会抛异常 FileAlreadyExistsException
+- 不能一次创建多级目录，否则会抛异常 NoSuchFileException
+
+创建**多级目录用**
+
+```
+Path path = Paths.get("helloword/d1/d2");
+Files.createDirectories(path);Copy
+```
+
+#### 拷贝及移动
+
+**拷贝文件**
+
+```
+Path source = Paths.get("helloword/data.txt");
+Path target = Paths.get("helloword/target.txt");
+
+Files.copy(source, target);Copy
+```
+
+- 如果文件已存在，会抛异常 FileAlreadyExistsException
+
+如果希望用 source **覆盖**掉 target，需要用 StandardCopyOption 来控制
+
+```
+Files.copy(source, target, StandardCopyOption.REPLACE_EXISTING);Copy
+```
+
+移动文件
+
+```
+Path source = Paths.get("helloword/data.txt");
+Path target = Paths.get("helloword/data.txt");
+
+Files.move(source, target, StandardCopyOption.ATOMIC_MOVE);Copy
+```
+
+- **StandardCopyOption.ATOMIC_MOVE 保证文件移动的原子性**
+
+#### 删除
+
+删除文件
+
+```
+Path target = Paths.get("helloword/target.txt");
+
+Files.delete(target);Copy
+```
+
+- 如果文件不存在，会抛异常 NoSuchFileException
+
+删除目录
+
+```
+Path target = Paths.get("helloword/d1");
+
+Files.delete(target);Copy
+```
+
+- 如果**目录还有内容**，会抛异常 DirectoryNotEmptyException
+
+#### 删除多级目录
+
+```java
+Files.walkFileTree(Paths.get("路径"), new SimpleFileVisitor<Path>() {
+    @Override
+    public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+        // 访问目录时删除目录里面的文件
+        Files.delete(file);
+        return super.visitFile(file, attrs);
+    }
+    @Override
+    public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
+        // 退出目录时删除目录
+        Files.delete(dir);
+        return super.postVisitDirectory(dir, exc);
+    }
+});
+```
+
+
+
+#### 遍历多级目录
+
+```java
+Path path = Paths.get("/Users/wh37/Documents/Doc/Netty/netty-demo");
+// 文件目录数目
+AtomicInteger dirCount = new AtomicInteger();
+// 文件数目
+AtomicInteger fileCount = new AtomicInteger();
+Files.walkFileTree(path, new SimpleFileVisitor<Path>(){
+    @Override
+    public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
+        System.out.println("===>"+dir);
+        // 增加文件目录数
+        dirCount.incrementAndGet();
+        return super.preVisitDirectory(dir, attrs);
+    }
+
+    @Override
+    public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+        System.out.println(file);
+        // 增加文件数
+        fileCount.incrementAndGet();
+        return super.visitFile(file, attrs);
+    }
+
+});
+// 打印数目
+System.out.println("文件目录数:"+dirCount.get());
+System.out.println("文件数:"+fileCount.get());
+```
+
+
+
+#### 拷贝多级目录
+
+```java
+String source = "/Users/wh37/Documents/Doc/Netty/netty-demo/logs";
+String target = "/Users/wh37/Documents/Doc/Netty/netty-demo/logs-test-copy";
+
+Files.walk(Paths.get(source)).forEach(path -> {
+    try {
+        String targetName = path.toString().replace(source, target);
+        // 是目录
+        if (Files.isDirectory(path)) {
+            Files.createDirectory(Paths.get(targetName));
+        }
+        // 是普通文件
+        else if (Files.isRegularFile(path)) {
+            Files.copy(path, Paths.get(targetName));
+        }
+    } catch (IOException e) {
+        e.printStackTrace();
+    }
+});
 ```
 
