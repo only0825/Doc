@@ -161,7 +161,271 @@ byte b = buf.get();
 get 方法会让 position 读指针向后走，如果想重复读取数据
 
 * 可以调用 rewind 方法将 position 重新置为 0
-* 或者调用 get(int i) 方法获取索引 i 的内容， 它就不会移动读指针
+* 或者调用 **get(int i)** 方法获取索引 i 的内容， 它就不会移动读指针
 
 
+
+
+
+#### rewind 
+
+从头开始读
+
+```java
+// 'a', 'b', 'c', 'd'
+buffer.get(new byte[4]);
+debugAll(buffer);
+buffer.rewind();
+System.out.println((char) buffer.get());
+```
+
+```
++--------+-------------------- all ------------------------+----------------+
+position: [4], limit: [4]
+         +-------------------------------------------------+
+         |  0  1  2  3  4  5  6  7  8  9  a  b  c  d  e  f |
++--------+-------------------------------------------------+----------------+
+|00000000| 61 62 63 64 00 00 00 00 00 00                   |abcd......      |
++--------+-------------------------------------------------+----------------+
+a
+```
+
+
+
+#### mark & reset
+
+mark 做一个标记，记录 position 位置， reset 是将 position 重置到 mark 的位置
+
+```java
+// 'a', 'b', 'c', 'd'
+System.out.println((char) buffer.get());
+System.out.println((char) buffer.get());
+buffer.mark(); // 加标记，索引2 的位置
+System.out.println((char) buffer.get());
+System.out.println((char) buffer.get());
+buffer.reset(); // 将 position 重置到索引 2
+System.out.println((char) buffer.get());
+System.out.println((char) buffer.get());
+/*
+a
+b
+c
+d
+c
+d
+/*
+```
+
+#### get(i) 
+
+不会改变读索引的位置
+
+```java
+System.out.println((char) buffer.get(3));
+debugAll(buffer);
+```
+
+```
+d
++--------+-------------------- all ------------------------+----------------+
+position: [0], limit: [4]
+         +-------------------------------------------------+
+         |  0  1  2  3  4  5  6  7  8  9  a  b  c  d  e  f |
++--------+-------------------------------------------------+----------------+
+|00000000| 61 62 63 64 00 00 00 00 00 00                   |abcd......      |
++--------+-------------------------------------------------+----------------+
+```
+
+
+
+#### 字符串与 ByteBuffer 互转
+
+```java
+        // 字符串转为 ByteBuffer 3种方法
+        // 1. 原始方法
+        ByteBuffer buffer1 = ByteBuffer.allocate(16);
+        buffer1.put("hello".getBytes());
+        debugAll(buffer1);
+        // 2. Charset
+        ByteBuffer buffer2 = StandardCharsets.UTF_8.encode("hello"); // 会自动转为
+        debugAll(buffer2);
+        // 3. wrap
+        ByteBuffer buffer3 = ByteBuffer.wrap("hello".getBytes());
+        debugAll(buffer3);
+
+
+        // ByteBuffer 转字符串
+        // 2 和 3 都是直接切换到读模式 再转可以不用filp()切换到读模式
+        String str1 = StandardCharsets.UTF_8.decode(buffer2).toString();
+        System.out.println(str1);
+        // 1方法再转就要用filp()转成读模式
+        buffer1.flip();
+        String str2 = StandardCharsets.UTF_8.decode(buffer1).toString();
+        System.out.println(str2);
+```
+
+
+
+### 2.4 分散读与集中写
+
+主要是一种思想，可以减少数据再ByteBuffer之间的拷贝，变相的提高了效率
+
+#### 2.4.1 Scattering Reads
+
+分散读取，有一个文本words.txt
+
+```
+onetwothree
+```
+
+**需求**：读取words.txt中的onetwothree，并输出one、two、three
+
+**思路** (重点)
+
+1. 将数据存入一个ByteBuffer，之后再用别的方法拆分成三组，涉及到数据重新的分割复制
+2. 读取时一次读到3个ByteBuffer (分散读取)
+
+```java
+// 分散读取
+try (FileChannel channel = new RandomAccessFile("words.txt", "r").getChannel()) {
+  ByteBuffer b1 = ByteBuffer.allocate(3);
+  ByteBuffer b2 = ByteBuffer.allocate(3);
+  ByteBuffer b3 = ByteBuffer.allocate(5);
+  channel.read(new ByteBuffer[]{b1, b2, b3});
+  b1.flip();
+  b2.flip();
+  b3.flip();
+  debugAll(b1);
+  debugAll(b2);
+  debugAll(b3);
+} catch (IOException e) {
+  e.printStackTrace();
+}
+```
+
+```
++--------+-------------------- all ------------------------+----------------+
+position: [0], limit: [3]
+         +-------------------------------------------------+
+         |  0  1  2  3  4  5  6  7  8  9  a  b  c  d  e  f |
++--------+-------------------------------------------------+----------------+
+|00000000| 6f 6e 65                                        |one             |
++--------+-------------------------------------------------+----------------+
++--------+-------------------- all ------------------------+----------------+
+position: [0], limit: [3]
+         +-------------------------------------------------+
+         |  0  1  2  3  4  5  6  7  8  9  a  b  c  d  e  f |
++--------+-------------------------------------------------+----------------+
+|00000000| 74 77 6f                                        |two             |
++--------+-------------------------------------------------+----------------+
++--------+-------------------- all ------------------------+----------------+
+position: [0], limit: [5]
+         +-------------------------------------------------+
+         |  0  1  2  3  4  5  6  7  8  9  a  b  c  d  e  f |
++--------+-------------------------------------------------+----------------+
+|00000000| 74 68 72 65 65                                  |three           |
++--------+-------------------------------------------------+----------------+
+```
+
+
+
+#### 2.4.2 Gathering Writes
+
+需求：三个ByteBuffer写入到一个文件中
+
+思路：
+
+1. 三个ByteBuffer组合到一个大的ByteBuffer中，涉及到数据到多次拷贝
+2. 三个ByteBuffer组合到一起，以一个整体写入
+
+
+
+```java
+ByteBuffer b1 = StandardCharsets.UTF_8.encode("hello");
+ByteBuffer b2 = StandardCharsets.UTF_8.encode("world");
+ByteBuffer b3 = StandardCharsets.UTF_8.encode("你好");
+
+try (FileChannel channel = new RandomAccessFile("words2.txt", "rw").getChannel()) {
+    channel.write(new ByteBuffer[]{b1, b2, b3});
+} catch (IOException e) {
+    e.printStackTrace();
+}
+```
+
+
+
+
+
+### 2.5 粘包与半包
+
+#### 现象
+
+网络上有多条数据发送给服务端，数据之间使用 \n 进行分隔
+但由于某种原因这些数据在接收时，被进行了重新组合，例如原始数据有3条为
+
+- Hello,world\n
+- I’m Nyima\n
+- How are you?\n
+
+变成了下面的两个 byteBuffer (粘包，半包)
+
+- Hello,world\nI’m Nyima\nHo
+- w are you?\n
+
+#### 出现原因
+
+**粘包**
+
+发送方在发送数据时，并不是一条一条地发送数据，而是**将数据整合在一起**，当数据达到一定的数量后再一起发送。这就会导致多条信息被放在一个缓冲区中被一起发送出去
+
+**半包**
+
+接收方的缓冲区的大小是有限的，当接收方的缓冲区满了以后，就需要**将信息截断**，等缓冲区空了以后再继续放入数据。这就会发生一段完整的数据最后被截断的现象
+
+#### 解决办法
+
+下面只是原始解法，要会，这样才能知道netty帮我们做了哪些事情
+
+```java
+   // 解决粘包和半包问题，下面只是原始解法，要会，这样才能知道netty帮我们做了哪些事情
+    public static void main(String[] args) {
+        /*
+            网络上有多条数据发送给服务端，数据之间使用 \n 进行分隔
+            但由于某种原因这些数据在接收时，被进行了重新组合，例如原始数据有3条为
+            - Hello,world\n
+            - I’m Nyima\n
+            - How are you?\n
+            变成了下面的两个 byteBuffer (粘包，半包)
+            - Hello,world\nI’m Nyima\nHo
+            - w are you?\n
+            现在要求你编写程序，将错误的数据恢复成原始按 \n 分割的数据
+         */
+        ByteBuffer source = ByteBuffer.allocate(32);
+      	// 模拟粘包+半包
+        source.put("Hello,world\nI'm zhangsan\nHo".getBytes());
+        split(source);
+        source.put("w are you ?\n".getBytes());
+        split(source);
+    }
+
+    public static void split(ByteBuffer source) {
+      	// 切换为读模式
+        source.flip();
+        for (int i = 0; i < source.limit(); i++) {
+            // 找到一条完整消息
+            if (source.get(i) == '\n') { // get(i)不会移动position
+                int length = i + 1 - source.position(); // 当前位置 - 读指针位置
+                // 把这条完整消息存入新的 ByteBuffers
+                ByteBuffer target = ByteBuffer.allocate(length);
+                // 从source 读，向 target 写
+                for (int j = 0; j < length; j++) {
+                    target.put(source.get()); // get 方法会让 position 读指针向后走
+                }
+                debugAll(target);
+            }
+        }
+        // 切换为写模式，但是缓冲区可能未读完，这里需要使用compact
+        source.compact();
+    }
+```
 
