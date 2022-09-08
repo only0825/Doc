@@ -1,4 +1,4 @@
-package netty.c1;
+package netty.c2;
 
 import java.io.IOException;
 import java.io.RandomAccessFile;
