@@ -760,13 +760,20 @@ Files.walk(Paths.get(source)).forEach(path -> {
 
 ## 4. 网络编程
 
+
+
 ### 4.1 非阻塞 vs 阻塞
 
 #### 阻塞
 
-* 在没有数据可读时，包括数据复制过程中，线程必须阻塞等待，不会占用CPU，但线程相当于限制
-* 32 位 jvm 一个线程 320k，64 位 jvm 一个线程 1024k，为了减少线程数，需要采用线程池技术
-* 但即便用了线程池，如果有很多连接建立，但长时间 inactive，会阻塞线程池中所有线程
+- 阻塞模式下，相关方法都会导致线程暂停
+  - ServerSocketChannel.accept 会在没有连接建立时让线程暂停
+  - SocketChannel.read 会在没有数据可读时让线程暂停
+  - 阻塞的表现其实就是线程暂停了，暂停期间不会占用 cpu，但线程相当于闲置
+- 单线程下，阻塞方法之间相互影响，几乎不能正常工作，需要多线程支持
+- 但多线程下，有新的问题，体现在以下方面
+  - 32 位 jvm 一个线程 320k，64 位 jvm 一个线程 1024k，如果连接数过多，必然导致 OOM，并且线程太多，反而会因为频繁上下文切换导致性能降低
+  - 可以采用线程池技术来减少线程数和线程上下文切换，但治标不治本，如果有很多连接建立，但长时间 inactive，会阻塞线程池中所有线程，因此不适合长连接，只适合短连接
 
 ```java
 // 使用 nio 来理解阻塞模式，单线程
@@ -801,11 +808,16 @@ sc.connect(new InetSocketAddress("localhost", 8880));
 System.out.println("waiting...");
 ```
 
+
+
 #### 非阻塞
 
-* 在某个 Channel 没有可读事件时，线程不必阻塞，它可以去处理其它可读事件的 Channel
+* 非阻塞模式下，相关方法都会不会让线程暂停
+  - 在 ServerSocketChannel.accept 在没有连接建立时，会返回 null，继续运行
+  - SocketChannel.read 在没有数据可读时，会返回 0，但线程不必阻塞，可以去执行其它 SocketChannel 的 read 或是去执行 ServerSocketChannel.accept
+  - 写数据时，线程只是等待数据写入 Channel 即可，无需等 Channel 通过网络把数据发送出去
+* 但非阻塞模式下，即使没有连接建立，和可读数据，线程仍然在不断运行，白白浪费了 cpu
 * 数据复制过程中，线程实际还是阻塞的（AIO 改进的地方）
-* 写数据时，线程只是等待数据写入 Channel 即可，无需等 Channel 通过网络把数据发送出去
 
 ```java
 // 0. ByteBuffer
@@ -843,6 +855,8 @@ sc.connect(new InetSocketAddress("localhost", 8880));
 System.out.println("waiting...");
 ```
 
+
+
 #### 多路复用
 
 单线程可以配合 Selector 完成对多个 Channel 可读写事件的监控，这称之为多路复用
@@ -853,6 +867,8 @@ System.out.println("waiting...");
   - 有可读事件才去读取
   - 有可写事件才去写入
     - 限于网络传输能力，Channel 未必时时可写，一旦 Channel 可写，会触发 Selector 的可写事件
+
+
 
 ### 4.2 Selector
 
@@ -873,11 +889,15 @@ end
 - 节约了线程的数量
 - 减少了线程上下文切换
 
+
+
 #### 创建
 
 ```java
 Selector selector = Selector.open();
 ```
+
+
 
 #### 绑定 Channel 事件
 
@@ -896,6 +916,8 @@ SelectionKey key = channel.register(selector, 绑定事件);
   - read - 数据可读入时触发，有因为接收能力弱，数据暂不能读入的情况
   - write - 数据可写出时触发，有因为发送能力弱，数据暂不能写出的情况
 
+
+
 #### 监听 Channel 事件
 
 可以通过下面三种方法来监听是否有事件发生，方法的返回值代表有多少 channel 发生了事件
@@ -906,17 +928,23 @@ SelectionKey key = channel.register(selector, 绑定事件);
 int count = selector.select();
 ```
 
+
+
 方法2，阻塞直到绑定事件发生，或是超时（时间单位为 ms）
 
 ```java
 int count = selector.select(long timeout);
 ```
 
+
+
 方法3，不会阻塞，也就是不管有没有事件，立刻返回，自己根据返回值检查是否有事件
 
 ```java
 int count = selector.selectNow();
 ```
+
+
 
 ### 💡 select 何时不阻塞
 
@@ -928,6 +956,8 @@ int count = selector.selectNow();
 > - 调用 selector.wakeup()
 > - 调用 selector.close()
 > - selector 所在线程 interrupt
+
+
 
 ### 4.3 处理 accept 事件
 
@@ -991,9 +1021,13 @@ public class Server {
 
 
 
+
+
 #### 💡 事件发生后能否不处理
 
 > 事件发生后，要么处理，要么取消（cancel），不能什么都不做，否则下次该事件仍会触发，这是因为 nio 底层使用的是水平触发
+
+
 
 ### 4.4 处理 read 事件
 
@@ -1072,12 +1106,16 @@ sun.nio.ch.ServerSocketChannelImpl[/0:0:0:0:0:0:0:0:8080]
 +--------+-------------------------------------------------+----------------+
 ```
 
+
+
 #### 💡 为何要 iter.remove()
 
 > 因为 select 在事件发生后，就会将相关的 key 放入 selectedKeys 集合，但不会在处理完后从 selectedKeys 集合中移除，需要我们自己编码删除。例如
 >
 > - 第一次触发了 ssckey 上的 accept 事件，没有移除 ssckey
 > - 第二次触发了 sckey 上的 read 事件，但这时 selectedKeys 中还有上次的 ssckey ，在处理时因为没有真正的 serverSocket 连上了，就会导致空指针异常
+
+
 
 #### 💡 cancel 的作用
 
@@ -1285,11 +1323,105 @@ public static void main(String[] args) throws IOException {
   - 一种思路是首先分配一个较小的 buffer，例如 4k，如果发现数据不够，再分配 8k 的 buffer，将 4k buffer 内容拷贝至 8k buffer，优点是消息连续容易处理，缺点是数据拷贝耗费性能，参考实现 http://tutorials.jenkov.com/java-performance/resizable-array.html
   - 另一种思路是用多个数组组成 buffer，一个数组不够，把多出来的内容写入新的数组，与前面的区别是消息存储不连续解析复杂，优点是避免了拷贝引起的性能损耗
 
-### 4.5 优化
+
+
+### [4.5 处理 write 事件](https://bright-boy.gitee.io/technical-notes/#/网络编程/netty?id=_45-处理-write-事件)
+
+#### 一次无法写完例子
+
+- 非阻塞模式下，无法保证把 buffer 中所有数据都写入 channel，因此需要追踪 write 方法的返回值（代表实际写入字节数）
+- 用 selector 监听所有 channel 的可写事件，每个 channel 都需要一个 key 来跟踪 buffer，但这样又会导致占用内存过多，就有两阶段策略
+  - 当消息处理器第一次写入消息时，才将 channel 注册到 selector 上
+  - selector 检查 channel 上的可写事件，如果所有的数据写完了，就取消 channel 的注册
+  - 如果不取消，会每次可写均会触发 write 事件
+
+```java
+// 写数据 向客户端发送数据
+public class WriteServer {
+
+    public static void main(String[] args) throws IOException {
+        ServerSocketChannel ssc = ServerSocketChannel.open();
+        ssc.configureBlocking(false);
+        Selector selector = Selector.open();
+        ssc.register(selector, SelectionKey.OP_ACCEPT);
+        ssc.bind(new InetSocketAddress(8880));
+        while (true) {
+            selector.select();
+            Iterator<SelectionKey> iter = selector.selectedKeys().iterator();
+            while (iter.hasNext()) {
+                SelectionKey key = iter.next();
+                iter.remove();
+                if (key.isAcceptable()) {
+                    SocketChannel sc = ssc.accept();
+                    sc.configureBlocking(false);
+                    SelectionKey sckey = sc.register(selector, 0, null);
+                    sckey.interestOps(SelectionKey.OP_READ);
+                    // 1. 向客户端发送大量数据
+                    StringBuilder sb = new StringBuilder();
+                    for (int i = 0; i < 5000000; i++) {
+                        sb.append("a");
+                    }
+                    ByteBuffer buffer = Charset.defaultCharset().encode(sb.toString());
+//                    while (buffer.hasRemaining()) {
+//                        // 2. 返回值代表写入的字节数
+//                        int write = sc.write(buffer);
+//                        System.out.println(write);
+//                    }
+                    // 2. 返回值代表写入的字节数
+                    int write = sc.write(buffer);
+                    System.out.println(write);
+
+                    // 3. 判断是否有剩余内容
+                    if (buffer.hasRemaining()) {
+                        // 4. 关注可写事件
+                        sckey.interestOps(sckey.interestOps() + SelectionKey.OP_WRITE);
+//                        sckey.interestOps(sckey.interestOps() | SelectionKey.OP_WRITE);
+                        // 5. 把未写完的数据挂到 sckey 上
+                        sckey.attach(buffer);
+                    }
+                } else if (key.isWritable()) {
+                    ByteBuffer buffer = (ByteBuffer) key.attachment();
+                    SocketChannel sc = (SocketChannel) key.channel();
+                    int write = sc.write(buffer);
+                    System.out.println(write);
+                    // 6. 清理操作
+                    if (!buffer.hasRemaining()) {
+                        key.attach(null); // 需要清楚buffer
+                        key.interestOps(key.interestOps() - SelectionKey.OP_WRITE); // 不需关注可写事件了
+                    }
+                }
+            }
+        }
+    }
+}
+```
+
+```java
+public class WriteClient {
+
+    public static void main(String[] args) throws IOException {
+        SocketChannel sc = SocketChannel.open();
+        sc.connect(new InetSocketAddress("localhost", 8880));
+
+        // 3. 接收数据
+        int count = 0;
+        while (true) {
+            ByteBuffer buffer = ByteBuffer.allocate(1024 * 1024);
+            count += sc.read(buffer);
+            System.out.println(count);
+            buffer.clear();
+        }
+    }
+}
+```
 
 
 
-### 4.6 UDP
+### 4.6 更进一步
+
+
+
+### 4.7 UDP
 
 
 
