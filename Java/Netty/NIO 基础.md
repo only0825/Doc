@@ -1419,12 +1419,232 @@ public class WriteClient {
 
 ### 4.6 更进一步
 
+#### 💡 利用多线程优化
+
+> 现在都是多核 cpu，设计时要充分考虑别让 cpu 的力量被白白浪费
+
+前面的代码只有一个选择器，没有充分利用多核 cpu，如何改进呢？
+
+分两组选择器
+
+- 单线程配一个选择器，专门处理 accept 事件
+- 创建 cpu 核心数的线程，每个线程配一个选择器，轮流处理 read 事件
+
+```java
+public class MultiThreaClient {
+
+    public static void main(String[] args) throws IOException {
+
+        SocketChannel sc = SocketChannel.open();
+        sc.connect(new InetSocketAddress("localhost", 8880));
+        sc.write(Charset.defaultCharset().encode("1234567890abcdef"));
+        System.in.read();
+    }
+}
+```
+
+```java
+
+@Slf4j
+public class MultiThreadServer {
+
+    public static void main(String[] args) throws IOException {
+        Thread.currentThread().setName("boss");
+        ServerSocketChannel ssc = ServerSocketChannel.open(); // 这个Channel可以监听新来的连接
+        ssc.configureBlocking(false); // 非阻塞
+        ssc.bind(new InetSocketAddress(8880)); // 绑定8880 端口
+        Selector boss = Selector.open(); // 创建Selector
+        ssc.register(boss, SelectionKey.OP_ACCEPT, null); // 注册并绑定ACCEPT事件
+
+        // 1. 创建固定数量的 worker 并初始化
+        Worker[] workers = new Worker[2];
+        for (int i = 0; i < workers.length; i++) {
+            workers[i] = new Worker("worker-" + i);
+        }
+        AtomicInteger index = new AtomicInteger();
+        while (true) {
+            boss.select();
+            Iterator<SelectionKey> iter = boss.selectedKeys().iterator();
+            if (iter.hasNext()) {
+                SelectionKey key = iter.next();
+                iter.remove();
+                if (key.isAcceptable()) {
+                    SocketChannel sc = ssc.accept();
+                    sc.configureBlocking(false);
+                    log.debug("connected...{}", sc.getRemoteAddress());
+                    // 2. 关联 selector
+                    log.debug("before register...{}", sc.getRemoteAddress());
+                    workers[index.getAndIncrement() % workers.length].register(sc); // boss 调用 初始化 selector ， 启动 worker-0
+                    log.debug("after register...{}", sc.getRemoteAddress());
+                }
+            }
+        }
+    }
+
+    static class Worker implements Runnable {
+        private Thread thread;
+        private Selector selector;
+        private String name;
+        // Volatile可以看做是轻量级的 Synchronized，它只保证了共享变量的可见性。在线程 A 修改被 volatile 修饰的共享变量之后，线程 B 能够读取到正确的值。
+        private volatile boolean start = false; // 还未初始化
+        private ConcurrentLinkedQueue<Runnable> queue = new ConcurrentLinkedQueue<>();
+
+        public Worker(String name) {
+            this.name = name;
+        }
+
+        // 问题：如果sc.register(selector, SelectionKey.OP_READ, null) 写在 Boss 线程，
+        // 但 selector.select(); 是在work线程，而且他们用的同一个selector，
+        // 当 selector.select(); 先执行就会阻塞，从而影响到sc.register
+        // 下面有两种解决办法：队列方法 和 wakeup方法
+
+        // 初始化线程 和 selector
+        public void register(SocketChannel sc) throws IOException {
+            if (!start) {
+                selector = Selector.open();
+                thread = new Thread(this, name);
+                thread.start();
+                start = true;
+            }
+
+            // 队列方法解决问题
+            // 向队列添加了任务，但这个任务并没有立刻执行 boss
+            queue.add(()->{
+                try {
+                    sc.register(selector, SelectionKey.OP_READ, null);
+                } catch (ClosedChannelException e) {
+                    e.printStackTrace();
+                }
+            });
+            selector.wakeup(); // 唤醒 select 方法
+
+            // wakeup方法解决问题  这个解法有问题 当第三个客户端连接时会阻塞
+//            selector.wakeup(); // 唤醒 select 方法 boss
+//            sc.register(selector, SelectionKey.OP_READ, null); // boss
+        }
+
+        @Override
+        public void run() {
+            while (true) {
+                try {
+                    selector.select(); // worker-0 阻塞， wakeup
+
+                    // 队列方法解决问题
+                    Runnable task = queue.poll();
+                    if (task != null) {
+                        task.run(); // 执行了 sc.register(selector, SelectionKey.OP_READ, null);
+                    }
+
+                    Iterator<SelectionKey> iter = selector.selectedKeys().iterator();
+                    while (iter.hasNext()) {
+                        SelectionKey key = iter.next();
+                        iter.remove();
+                        if (key.isReadable()) {
+                            ByteBuffer buffer = ByteBuffer.allocate(16);
+                            SocketChannel channel = (SocketChannel) key.channel();
+                            log.debug("read...{}", channel.getRemoteAddress());
+                            channel.read(buffer);
+                            buffer.flip();
+                            debugAll(buffer);
+                        }
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+}
+
+```
+
+
+
+#### 💡 如何拿到 cpu 个数
+
+> - Runtime.getRuntime().availableProcessors() 如果工作在 docker 容器下，因为容器不是物理隔离的，会拿到物理 cpu 个数，而不是容器申请时的个数
+> - 这个问题直到 jdk 10 才修复，使用 jvm 参数 UseContainerSupport 配置， 默认开启
+
 
 
 ### 4.7 UDP
 
+- UDP 是无连接的，client 发送数据不会管 server 是否开启
+- server 这边的 receive 方法会将接收到的数据存入 byte buffer，但如果数据报文超过 buffer 大小，多出来的数据会被默默抛弃
 
+首先启动服务器端
+
+```java
+public class UdpServer {
+    public static void main(String[] args) {
+        try (DatagramChannel channel = DatagramChannel.open()) {
+            channel.socket().bind(new InetSocketAddress(9999));
+            System.out.println("waiting...");
+            ByteBuffer buffer = ByteBuffer.allocate(32);
+            channel.receive(buffer);
+            buffer.flip();
+            debug(buffer);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+}Copy to clipboardErrorCopied
+```
+
+输出
+
+```
+waiting...Copy to clipboardErrorCopied
+```
+
+运行客户端
+
+```java
+public class UdpClient {
+    public static void main(String[] args) {
+        try (DatagramChannel channel = DatagramChannel.open()) {
+            ByteBuffer buffer = StandardCharsets.UTF_8.encode("hello");
+            InetSocketAddress address = new InetSocketAddress("localhost", 9999);
+            channel.send(buffer, address);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+}Copy to clipboardErrorCopied
+```
+
+接下来服务器端输出
+
+```
+         +-------------------------------------------------+
+         |  0  1  2  3  4  5  6  7  8  9  a  b  c  d  e  f |
++--------+-------------------------------------------------+----------------+
+|00000000| 68 65 6c 6c 6f                                  |hello           |
++--------+-------------------------------------------------+----------------+Copy to clipboardErrorCopied
+```
 
 
 
 ## 5. NIO vs BIO
+
+### [5.1 stream vs channel](https://bright-boy.gitee.io/technical-notes/#/网络编程/netty?id=_51-stream-vs-channel)
+
+- stream 不会自动缓冲数据，channel 会利用系统提供的发送缓冲区、接收缓冲区（更为底层）
+- stream 仅支持阻塞 API，channel 同时支持阻塞、非阻塞 API，网络 channel 可配合 selector 实现多路复用
+- 二者均为全双工，即读写可以同时进行
+
+### [5.2 IO 模型](https://bright-boy.gitee.io/technical-notes/#/网络编程/netty?id=_52-io-模型)
+
+同步阻塞、同步非阻塞、同步多路复用、异步阻塞（没有此情况）、异步非阻塞
+
+- 同步：线程自己去获取结果（一个线程）
+- 异步：线程自己不去获取结果，而是由其它线程送结果（至少两个线程）
+
+当调用一次 channel.read 或 stream.read 后，会切换至操作系统内核态来完成真正数据读取，而读取又分为两个阶段，分别为：
+
+- 等待数据阶段
+- 复制数据阶段
+
+#### 🔖 参考
+
+UNIX 网络编程 - 卷 I
