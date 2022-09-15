@@ -26,7 +26,7 @@
 
 
     <!-- 用来控制查看哪个类的日志内容 name代表命名空间-->
-    <logger name="netty" level="DEBUG" additivity="false">
+    <logger name="nio" level="DEBUG" additivity="false">
         <appender-ref ref="STDOUT" />
     </logger>
 

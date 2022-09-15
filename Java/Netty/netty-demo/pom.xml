@@ -5,7 +5,7 @@
   <artifactId>netty-demo</artifactId>
   <packaging>war</packaging>
   <version>1.0-SNAPSHOT</version>
-  <name>netty-demo Maven Webapp</name>
+  <name>nio-demo Maven Webapp</name>
   <url>http://maven.apache.org</url>
 
   <properties>
@@ -18,7 +18,7 @@
     <dependency>
       <groupId>io.netty</groupId>
       <artifactId>netty-all</artifactId>
-      <version>4.1.77.Final</version>
+      <version>4.1.81.Final</version>
     </dependency>
     <!-- 生成get和set方法 -->
     <dependency>
@@ -42,7 +42,7 @@
     <dependency>
       <groupId>ch.qos.logback</groupId>
       <artifactId>logback-classic</artifactId>
-      <version>1.2.11</version>
+      <version>1.4.0</version>
     </dependency>
 
   </dependencies>
