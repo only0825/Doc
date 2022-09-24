@@ -7,15 +7,15 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "297FEE85-42AD-47C2-9013-7EE41A1E2C05"
+            uuid = "A7A5E8D4-DDAF-425A-96C6-58BBBB1A64A4"
             shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "mymacos/testc.c"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "58"
-            endingLineNumber = "58"
+            startingLineNumber = "101"
+            endingLineNumber = "101"
             landmarkName = "rec_audio()"
             landmarkType = "9">
          </BreakpointContent>
@@ -23,15 +23,15 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "5843E50D-252D-4971-97CB-862DC6EECCD6"
+            uuid = "25D2B888-3656-41A2-88A0-8A8B2F12468D"
             shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "mymacos/testc.c"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "41"
-            endingLineNumber = "41"
+            startingLineNumber = "153"
+            endingLineNumber = "153"
             landmarkName = "rec_audio()"
             landmarkType = "9">
          </BreakpointContent>

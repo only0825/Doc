@@ -7,6 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		8C83D2FC28DDD9E3006DFDA3 /* libswresample.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 8C83D2FA28DDD9E3006DFDA3 /* libswresample.dylib */; };
+		8C83D2FD28DDD9E3006DFDA3 /* libswresample.dylib in Embed Libraries */ = {isa = PBXBuildFile; fileRef = 8C83D2FA28DDD9E3006DFDA3 /* libswresample.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
+		8C83D2FE28DDD9E3006DFDA3 /* libavcodec.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 8C83D2FB28DDD9E3006DFDA3 /* libavcodec.dylib */; };
+		8C83D2FF28DDD9E4006DFDA3 /* libavcodec.dylib in Embed Libraries */ = {isa = PBXBuildFile; fileRef = 8C83D2FB28DDD9E3006DFDA3 /* libavcodec.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		8CB6EBD628D3411100D059BD /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8CB6EBD528D3411100D059BD /* AppDelegate.swift */; };
 		8CB6EBD828D3411100D059BD /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8CB6EBD728D3411100D059BD /* ViewController.swift */; };
 		8CB6EBDA28D3411200D059BD /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 8CB6EBD928D3411200D059BD /* Assets.xcassets */; };
@@ -28,8 +32,10 @@
 			dstSubfolderSpec = 10;
 			files = (
 				8CB6EBED28D3514E00D059BD /* libavutil.dylib in Embed Libraries */,
+				8C83D2FF28DDD9E4006DFDA3 /* libavcodec.dylib in Embed Libraries */,
 				8CB6EBF128D3514E00D059BD /* libavformat.dylib in Embed Libraries */,
 				8CB6EBEF28D3514E00D059BD /* libavdevice.dylib in Embed Libraries */,
+				8C83D2FD28DDD9E3006DFDA3 /* libswresample.dylib in Embed Libraries */,
 			);
 			name = "Embed Libraries";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -37,6 +43,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		8C83D2FA28DDD9E3006DFDA3 /* libswresample.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libswresample.dylib; path = mymacos/libs/libswresample.dylib; sourceTree = "<group>"; };
+		8C83D2FB28DDD9E3006DFDA3 /* libavcodec.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libavcodec.dylib; path = mymacos/libs/libavcodec.dylib; sourceTree = "<group>"; };
 		8CB6EBD228D3411100D059BD /* mymacos.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = mymacos.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		8CB6EBD528D3411100D059BD /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		8CB6EBD728D3411100D059BD /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -57,8 +65,10 @@
 			buildActionMask = 2147483647;
 			files = (
 				8CB6EBEC28D3514E00D059BD /* libavutil.dylib in Frameworks */,
+				8C83D2FE28DDD9E3006DFDA3 /* libavcodec.dylib in Frameworks */,
 				8CB6EBF028D3514E00D059BD /* libavformat.dylib in Frameworks */,
 				8CB6EBEE28D3514E00D059BD /* libavdevice.dylib in Frameworks */,
+				8C83D2FC28DDD9E3006DFDA3 /* libswresample.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -100,6 +110,8 @@
 		8CB6EBE828D3514D00D059BD /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				8C83D2FB28DDD9E3006DFDA3 /* libavcodec.dylib */,
+				8C83D2FA28DDD9E3006DFDA3 /* libswresample.dylib */,
 				8CB6EBEA28D3514E00D059BD /* libavdevice.dylib */,
 				8CB6EBEB28D3514E00D059BD /* libavformat.dylib */,
 				8CB6EBE928D3514D00D059BD /* libavutil.dylib */,
