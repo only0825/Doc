@@ -784,7 +784,7 @@ commit;
 
 ### 四大特性ACID
 
-- 原子性(Atomicity)：事务是不可分割的最小操作但愿，要么全部成功，要么全部失败
+- 原子性(Atomicity)：事务是不可分割的最小操作单元，要么全部成功，要么全部失败
 - 一致性(Consistency)：事务完成时，必须使所有数据都保持一致状态
 - 隔离性(Isolation)：数据库系统提供的隔离机制，保证事务在不受外部并发操作影响的独立环境下运行
 - 持久性(Durability)：事务一旦提交或回滚，它对数据库中的数据的改变就是永久的
@@ -936,10 +936,16 @@ Memory 引擎的表数据是存储在内存中的，受硬件问题、断电问�
 
 慢查询日志记录了所有执行时间超过指定参数（long_query_time，单位：秒，默认10秒）的所有SQL语句的日志。
 MySQL的慢查询日志默认没有开启，需要在MySQL的配置文件（/etc/my.cnf）中配置如下信息：
-	# 开启慢查询日志开关
-	slow_query_log=1
-	# 设置慢查询日志的时间为2秒，SQL语句执行时间超过2秒，就会视为慢查询，记录慢查询日志
-	long_query_time=2
+
+```sh
+# 开启慢查询日志开关
+slow_query_log=1
+
+# 设置慢查询日志的时间为2秒，SQL语句执行时间超过2秒，就会视为慢查询，记录慢查询日志
+long_query_time=2
+```
+
+
 更改后记得重启MySQL服务，日志文件位置：/var/lib/mysql/localhost-slow.log
 
 查看慢查询日志开关状态：
@@ -948,7 +954,7 @@ MySQL的慢查询日志默认没有开启，需要在MySQL的配置文件（/etc
 ### profile
 
 show profile 能在做SQL优化时帮我们了解时间都耗费在哪里。通过 have_profiling 参数，能看到当前 MySQL 是否支持 profile 操作：
-`SELECT @@have_profiling;`
+`SELECT @@have_profiling;`  `SELECT @@profiling;`是查看是否开启profile
 profiling 默认关闭，可以通过set语句在session/global级别开启 profiling：
 `SET profiling = 1;`
 查看所有语句的耗时：

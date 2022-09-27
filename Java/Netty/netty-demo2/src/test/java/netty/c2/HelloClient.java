@@ -30,5 +30,6 @@ public class HelloClient {
                 .channel()
                 // 6. 向服务器发送数据
                 .writeAndFlush("hello, world");
+        System.out.println();
     }
 }
