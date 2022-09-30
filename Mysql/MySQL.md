@@ -1014,15 +1014,18 @@ EXPLAIN 各字段含义：
 | R-Tree索引  | 不支持  | 支持  | 不支持  |
 | Full-text  | 5.6版本后支持  | 支持  | 不支持  |
 
-#### B-Tree
+#### 二叉树
 
 ![二叉树](https://dhc.pythonanywhere.com/media/editor/二叉树_20220316153214227108.png "二叉树")
 
-二叉树的缺点可以用红黑树来解决：
-![红黑树](https://dhc.pythonanywhere.com/media/editor/红黑树_20220316163142686602.png "红黑树")
-红黑树也存在大数据量情况下，层级较深，检索速度慢的问题。
+#### 红黑树(二叉平衡树)
 
-为了解决上述问题，可以使用 B-Tree 结构。
+![红黑树](https://dhc.pythonanywhere.com/media/editor/红黑树_20220316163142686602.png "红黑树")
+
+缺点：红黑树也存在大数据量情况下，层级较深，检索速度慢的问题。
+
+#### B-Tree
+
 B-Tree (多路平衡查找树) 以一棵最大度数（max-degree，指一个节点的子节点个数）为5（5阶）的 b-tree 为例（每个节点最多存储4个key，5个指针）
 
 ![B-Tree结构](https://dhc.pythonanywhere.com/media/editor/B-Tree结构_20220316163813441163.png "B-Tree结构")
@@ -1038,12 +1041,21 @@ B-Tree (多路平衡查找树) 以一棵最大度数（max-degree，指一个节
 
 > 演示地址：https://www.cs.usfca.edu/~galles/visualization/BPlusTree.html
 
-与 B-Tree 的区别：
+**与 B-Tree 的区别：**
 
 - 所有的数据都会出现在叶子节点
 - 叶子节点形成一个单向链表
 
 MySQL 索引数据结构对经典的 B+Tree 进行了优化。在原 B+Tree 的基础上，增加一个指向相邻叶子节点的链表指针，就形成了带有顺序指针的 B+Tree，提高区间访问的性能。
+
+##### 查找过程：
+
+如下图，查找18这个元素
+
+1. 根节点加载到内存，在内存里面折半查找，找到小于38。
+
+2. 将16-29的节点也加载到内存，进行折半查找，找到在16-29的中间
+3. 将叶子节点加载到内存，查找到18
 
 ![MySQL B+Tree 结构图](https://dhc.pythonanywhere.com/media/editor/结构图_20220316171730865611.png "MySQL B+Tree 结构图")
 
