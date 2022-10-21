@@ -1,0 +1,680 @@
+﻿
+
+
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>欢迎使用 IMOOC Cake 后台管理系统</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="../css/theme.css">
+    <link rel="stylesheet" type="text/css" href="../css/admin-forms.css">
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+    <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+    <![endif]-->
+</head>
+
+<body class="admin-validation-page" data-spy="scroll" data-target="#nav-spy" data-offset="200">
+<div id="main">
+    <header class="navbar navbar-fixed-top navbar-shadow">
+        <div class="navbar-branding">
+            <a class="navbar-brand" href="../index.html">
+                <H3>IMOOC Cake 后台管理系统</H3>
+            </a>
+            <span id="toggle_sidemenu_l" class="ad ad-lines"></span>
+        </div>
+    </header>
+    <aside id="sidebar_left" class="nano nano-light affix">
+        <div class="sidebar-left-content nano-content">
+            <header class="sidebar-header">
+                <div class="sidebar-widget author-widget">
+                    <div class="media">
+                        <a class="media-left" href="#">
+                            <img src="../images/head.jpg" class="img-responsive">
+                        </a>
+                        <div class="media-body">
+                            <div class="media-author">管理员</div>
+                            <div class="media-links">
+                                <a href="login.html">退出</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="sidebar-widget search-widget hidden">
+                    <div class="input-group">
+                        <span class="input-group-addon">
+                        <i class="fa fa-search"></i>
+                        </span>
+                        <input type="text" id="sidebar-search" class="form-control" placeholder="Search...">
+                    </div>
+                </div>
+            </header>
+            <ul class="nav sidebar-menu">
+                <li class="sidebar-label pt20">商品管理</li>
+                <li class="active">
+                    <a href="cake_list.html">
+                        <span class="glyphicon glyphicon-book"></span>
+                        <span class="sidebar-title">商品列表</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="cake_add.html">
+                        <span class="glyphicon glyphicon-home"></span>
+                        <span class="sidebar-title">商品上架</span>
+                    </a>
+                </li>
+                <li class="sidebar-label pt20">分类管理</li>
+                <li class="active">
+                    <a href="catalog_list.html">
+                        <span class="glyphicon glyphicon-book"></span>
+                        <span class="sidebar-title">分类列表</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="catalog_add.html">
+                        <span class="glyphicon glyphicon-home"></span>
+                        <span class="sidebar-title">添加分类</span>
+                    </a>
+                </li>
+            </ul>
+            <div class="sidebar-toggle-mini">
+                <a href="login.html">
+                    <span class="fa fa-sign-out"></span>
+                </a>
+            </div>
+        </div>
+    </aside>
+<section id="content_wrapper">
+    <section id="content" class="table-layout animated fadeIn">
+        <div class="tray tray-center">
+            <div class="content-header">
+                <h2> 分类管理</h2>
+                <p class="lead"></p>
+            </div>
+            <div class="admin-form theme-primary mw1000 center-block" style="padding-bottom: 175px;">
+                <div class="panel  heading-border">
+                    <div class="panel-menu">
+                        <div class="row">
+                            <div class="hidden-xs hidden-sm col-md-3">
+                                <div class="btn-group">
+                                    <button type="button" class="btn btn-default light">
+                                        <i class="fa fa-trash"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-default light">
+                                        <i class="fa fa-plus" onclick="javascript:window.location.href='catalog_add.html';"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="panel-body pn">
+                        <table id="message-table" class="table admin-form theme-warning tc-checkbox-1">
+                            <thead>
+                            <tr class="">
+                                <th class="text-center hidden-xs">Select</th>
+                                <th class="hidden-xs">名称</th>
+                                <th class="hidden-xs">描述</th>
+                                <th>操作</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            
+                                <tr class="message-unread">
+                                    <td class="hidden-xs">
+                                        <label class="option block mn">
+                                            <input type="checkbox" name="mobileos" value="FR">
+                                            <span class="checkbox mn"></span>
+                                        </label>
+                                    </td>
+                                    <td>婚礼</td>
+                                    <td></td>
+                                    <td>
+                                        <a href="catalog_list.html?id=11000">删除</a>
+                                    </td>
+                                </tr>
+                                
+                                    <tr class="message-unread">
+                                        <td class="hidden-xs">
+                                            <label class="option block mn">
+                                                <input type="checkbox" name="mobileos" value="FR">
+                                                <span class="checkbox mn"></span>
+                                            </label>
+                                        </td>
+                                        <td style="padding-left: 50px;">西式</td>
+                                        <td></td>
+                                        <td>
+                                            <a href="catalog_list.html?id=11100">删除</a>
+                                        </td>
+                                    </tr>
+                                    
+                                        <tr class="message-unread">
+                                            <td class="hidden-xs">
+                                                <label class="option block mn">
+                                                    <input type="checkbox" name="mobileos" value="FR">
+                                                    <span class="checkbox mn"></span>
+                                                </label>
+                                            </td>
+                                            <td style="padding-left: 100px;">多层</td>
+                                            <td></td>
+                                            <td>
+                                                <a href="catalog_list.html?id=11101">删除</a>
+                                            </td>
+                                        </tr>
+                                    
+                                        <tr class="message-unread">
+                                            <td class="hidden-xs">
+                                                <label class="option block mn">
+                                                    <input type="checkbox" name="mobileos" value="FR">
+                                                    <span class="checkbox mn"></span>
+                                                </label>
+                                            </td>
+                                            <td style="padding-left: 100px;">花朵</td>
+                                            <td></td>
+                                            <td>
+                                                <a href="catalog_list.html?id=11102">删除</a>
+                                            </td>
+                                        </tr>
+                                    
+                                        <tr class="message-unread">
+                                            <td class="hidden-xs">
+                                                <label class="option block mn">
+                                                    <input type="checkbox" name="mobileos" value="FR">
+                                                    <span class="checkbox mn"></span>
+                                                </label>
+                                            </td>
+                                            <td style="padding-left: 100px;">造型</td>
+                                            <td></td>
+                                            <td>
+                                                <a href="catalog_list.html?id=11103">删除</a>
+                                            </td>
+                                        </tr>
+                                    
+                                
+                                    <tr class="message-unread">
+                                        <td class="hidden-xs">
+                                            <label class="option block mn">
+                                                <input type="checkbox" name="mobileos" value="FR">
+                                                <span class="checkbox mn"></span>
+                                            </label>
+                                        </td>
+                                        <td style="padding-left: 50px;">传统</td>
+                                        <td></td>
+                                        <td>
+                                            <a href="catalog_list.html?id=11200">删除</a>
+                                        </td>
+                                    </tr>
+                                    
+                                        <tr class="message-unread">
+                                            <td class="hidden-xs">
+                                                <label class="option block mn">
+                                                    <input type="checkbox" name="mobileos" value="FR">
+                                                    <span class="checkbox mn"></span>
+                                                </label>
+                                            </td>
+                                            <td style="padding-left: 100px;">复古</td>
+                                            <td></td>
+                                            <td>
+                                                <a href="catalog_list.html?id=11201">删除</a>
+                                            </td>
+                                        </tr>
+                                    
+                                
+                            
+                                <tr class="message-unread">
+                                    <td class="hidden-xs">
+                                        <label class="option block mn">
+                                            <input type="checkbox" name="mobileos" value="FR">
+                                            <span class="checkbox mn"></span>
+                                        </label>
+                                    </td>
+                                    <td>生日</td>
+                                    <td></td>
+                                    <td>
+                                        <a href="catalog_list.html?id=12000">删除</a>
+                                    </td>
+                                </tr>
+                                
+                                    <tr class="message-unread">
+                                        <td class="hidden-xs">
+                                            <label class="option block mn">
+                                                <input type="checkbox" name="mobileos" value="FR">
+                                                <span class="checkbox mn"></span>
+                                            </label>
+                                        </td>
+                                        <td style="padding-left: 50px;">儿童</td>
+                                        <td></td>
+                                        <td>
+                                            <a href="catalog_list.html?id=12100">删除</a>
+                                        </td>
+                                    </tr>
+                                    
+                                        <tr class="message-unread">
+                                            <td class="hidden-xs">
+                                                <label class="option block mn">
+                                                    <input type="checkbox" name="mobileos" value="FR">
+                                                    <span class="checkbox mn"></span>
+                                                </label>
+                                            </td>
+                                            <td style="padding-left: 100px;">男孩</td>
+                                            <td></td>
+                                            <td>
+                                                <a href="catalog_list.html?id=12101">删除</a>
+                                            </td>
+                                        </tr>
+                                    
+                                        <tr class="message-unread">
+                                            <td class="hidden-xs">
+                                                <label class="option block mn">
+                                                    <input type="checkbox" name="mobileos" value="FR">
+                                                    <span class="checkbox mn"></span>
+                                                </label>
+                                            </td>
+                                            <td style="padding-left: 100px;">女孩</td>
+                                            <td></td>
+                                            <td>
+                                                <a href="catalog_list.html?id=12102">删除</a>
+                                            </td>
+                                        </tr>
+                                    
+                                        <tr class="message-unread">
+                                            <td class="hidden-xs">
+                                                <label class="option block mn">
+                                                    <input type="checkbox" name="mobileos" value="FR">
+                                                    <span class="checkbox mn"></span>
+                                                </label>
+                                            </td>
+                                            <td style="padding-left: 100px;">满月</td>
+                                            <td></td>
+                                            <td>
+                                                <a href="catalog_list.html?id=12103">删除</a>
+                                            </td>
+                                        </tr>
+                                    
+                                
+                                    <tr class="message-unread">
+                                        <td class="hidden-xs">
+                                            <label class="option block mn">
+                                                <input type="checkbox" name="mobileos" value="FR">
+                                                <span class="checkbox mn"></span>
+                                            </label>
+                                        </td>
+                                        <td style="padding-left: 50px;">老人</td>
+                                        <td></td>
+                                        <td>
+                                            <a href="catalog_list.html?id=12200">删除</a>
+                                        </td>
+                                    </tr>
+                                    
+                                        <tr class="message-unread">
+                                            <td class="hidden-xs">
+                                                <label class="option block mn">
+                                                    <input type="checkbox" name="mobileos" value="FR">
+                                                    <span class="checkbox mn"></span>
+                                                </label>
+                                            </td>
+                                            <td style="padding-left: 100px;">寿糕</td>
+                                            <td></td>
+                                            <td>
+                                                <a href="catalog_list.html?id=12201">删除</a>
+                                            </td>
+                                        </tr>
+                                    
+                                
+                                    <tr class="message-unread">
+                                        <td class="hidden-xs">
+                                            <label class="option block mn">
+                                                <input type="checkbox" name="mobileos" value="FR">
+                                                <span class="checkbox mn"></span>
+                                            </label>
+                                        </td>
+                                        <td style="padding-left: 50px;">成人</td>
+                                        <td></td>
+                                        <td>
+                                            <a href="catalog_list.html?id=12300">删除</a>
+                                        </td>
+                                    </tr>
+                                    
+                                        <tr class="message-unread">
+                                            <td class="hidden-xs">
+                                                <label class="option block mn">
+                                                    <input type="checkbox" name="mobileos" value="FR">
+                                                    <span class="checkbox mn"></span>
+                                                </label>
+                                            </td>
+                                            <td style="padding-left: 100px;">夫妻</td>
+                                            <td></td>
+                                            <td>
+                                                <a href="catalog_list.html?id=12301">删除</a>
+                                            </td>
+                                        </tr>
+                                    
+                                        <tr class="message-unread">
+                                            <td class="hidden-xs">
+                                                <label class="option block mn">
+                                                    <input type="checkbox" name="mobileos" value="FR">
+                                                    <span class="checkbox mn"></span>
+                                                </label>
+                                            </td>
+                                            <td style="padding-left: 100px;">亲戚</td>
+                                            <td></td>
+                                            <td>
+                                                <a href="catalog_list.html?id=12302">删除</a>
+                                            </td>
+                                        </tr>
+                                    
+                                        <tr class="message-unread">
+                                            <td class="hidden-xs">
+                                                <label class="option block mn">
+                                                    <input type="checkbox" name="mobileos" value="FR">
+                                                    <span class="checkbox mn"></span>
+                                                </label>
+                                            </td>
+                                            <td style="padding-left: 100px;">朋友</td>
+                                            <td></td>
+                                            <td>
+                                                <a href="catalog_list.html?id=12303">删除</a>
+                                            </td>
+                                        </tr>
+                                    
+                                
+                            
+                                <tr class="message-unread">
+                                    <td class="hidden-xs">
+                                        <label class="option block mn">
+                                            <input type="checkbox" name="mobileos" value="FR">
+                                            <span class="checkbox mn"></span>
+                                        </label>
+                                    </td>
+                                    <td>节日</td>
+                                    <td></td>
+                                    <td>
+                                        <a href="catalog_list.html?id=13000">删除</a>
+                                    </td>
+                                </tr>
+                                
+                                    <tr class="message-unread">
+                                        <td class="hidden-xs">
+                                            <label class="option block mn">
+                                                <input type="checkbox" name="mobileos" value="FR">
+                                                <span class="checkbox mn"></span>
+                                            </label>
+                                        </td>
+                                        <td style="padding-left: 50px;">家庭</td>
+                                        <td></td>
+                                        <td>
+                                            <a href="catalog_list.html?id=13100">删除</a>
+                                        </td>
+                                    </tr>
+                                    
+                                        <tr class="message-unread">
+                                            <td class="hidden-xs">
+                                                <label class="option block mn">
+                                                    <input type="checkbox" name="mobileos" value="FR">
+                                                    <span class="checkbox mn"></span>
+                                                </label>
+                                            </td>
+                                            <td style="padding-left: 100px;">母亲节</td>
+                                            <td></td>
+                                            <td>
+                                                <a href="catalog_list.html?id=13101">删除</a>
+                                            </td>
+                                        </tr>
+                                    
+                                        <tr class="message-unread">
+                                            <td class="hidden-xs">
+                                                <label class="option block mn">
+                                                    <input type="checkbox" name="mobileos" value="FR">
+                                                    <span class="checkbox mn"></span>
+                                                </label>
+                                            </td>
+                                            <td style="padding-left: 100px;">父亲节</td>
+                                            <td></td>
+                                            <td>
+                                                <a href="catalog_list.html?id=13102">删除</a>
+                                            </td>
+                                        </tr>
+                                    
+                                        <tr class="message-unread">
+                                            <td class="hidden-xs">
+                                                <label class="option block mn">
+                                                    <input type="checkbox" name="mobileos" value="FR">
+                                                    <span class="checkbox mn"></span>
+                                                </label>
+                                            </td>
+                                            <td style="padding-left: 100px;">儿童节</td>
+                                            <td></td>
+                                            <td>
+                                                <a href="catalog_list.html?id=13103">删除</a>
+                                            </td>
+                                        </tr>
+                                    
+                                        <tr class="message-unread">
+                                            <td class="hidden-xs">
+                                                <label class="option block mn">
+                                                    <input type="checkbox" name="mobileos" value="FR">
+                                                    <span class="checkbox mn"></span>
+                                                </label>
+                                            </td>
+                                            <td style="padding-left: 100px;">情人节</td>
+                                            <td></td>
+                                            <td>
+                                                <a href="catalog_list.html?id=13104">删除</a>
+                                            </td>
+                                        </tr>
+                                    
+                                
+                                    <tr class="message-unread">
+                                        <td class="hidden-xs">
+                                            <label class="option block mn">
+                                                <input type="checkbox" name="mobileos" value="FR">
+                                                <span class="checkbox mn"></span>
+                                            </label>
+                                        </td>
+                                        <td style="padding-left: 50px;">送人</td>
+                                        <td></td>
+                                        <td>
+                                            <a href="catalog_list.html?id=13200">删除</a>
+                                        </td>
+                                    </tr>
+                                    
+                                        <tr class="message-unread">
+                                            <td class="hidden-xs">
+                                                <label class="option block mn">
+                                                    <input type="checkbox" name="mobileos" value="FR">
+                                                    <span class="checkbox mn"></span>
+                                                </label>
+                                            </td>
+                                            <td style="padding-left: 100px;">教师节</td>
+                                            <td></td>
+                                            <td>
+                                                <a href="catalog_list.html?id=13201">删除</a>
+                                            </td>
+                                        </tr>
+                                    
+                                        <tr class="message-unread">
+                                            <td class="hidden-xs">
+                                                <label class="option block mn">
+                                                    <input type="checkbox" name="mobileos" value="FR">
+                                                    <span class="checkbox mn"></span>
+                                                </label>
+                                            </td>
+                                            <td style="padding-left: 100px;">圣诞节</td>
+                                            <td></td>
+                                            <td>
+                                                <a href="catalog_list.html?id=13202">删除</a>
+                                            </td>
+                                        </tr>
+                                    
+                                
+                            
+                                <tr class="message-unread">
+                                    <td class="hidden-xs">
+                                        <label class="option block mn">
+                                            <input type="checkbox" name="mobileos" value="FR">
+                                            <span class="checkbox mn"></span>
+                                        </label>
+                                    </td>
+                                    <td>专用</td>
+                                    <td></td>
+                                    <td>
+                                        <a href="catalog_list.html?id=14000">删除</a>
+                                    </td>
+                                </tr>
+                                
+                                    <tr class="message-unread">
+                                        <td class="hidden-xs">
+                                            <label class="option block mn">
+                                                <input type="checkbox" name="mobileos" value="FR">
+                                                <span class="checkbox mn"></span>
+                                            </label>
+                                        </td>
+                                        <td style="padding-left: 50px;">聚会</td>
+                                        <td></td>
+                                        <td>
+                                            <a href="catalog_list.html?id=14100">删除</a>
+                                        </td>
+                                    </tr>
+                                    
+                                        <tr class="message-unread">
+                                            <td class="hidden-xs">
+                                                <label class="option block mn">
+                                                    <input type="checkbox" name="mobileos" value="FR">
+                                                    <span class="checkbox mn"></span>
+                                                </label>
+                                            </td>
+                                            <td style="padding-left: 100px;">商业宴会</td>
+                                            <td></td>
+                                            <td>
+                                                <a href="catalog_list.html?id=14101">删除</a>
+                                            </td>
+                                        </tr>
+                                    
+                                        <tr class="message-unread">
+                                            <td class="hidden-xs">
+                                                <label class="option block mn">
+                                                    <input type="checkbox" name="mobileos" value="FR">
+                                                    <span class="checkbox mn"></span>
+                                                </label>
+                                            </td>
+                                            <td style="padding-left: 100px;">同学聚会</td>
+                                            <td></td>
+                                            <td>
+                                                <a href="catalog_list.html?id=14102">删除</a>
+                                            </td>
+                                        </tr>
+                                    
+                                        <tr class="message-unread">
+                                            <td class="hidden-xs">
+                                                <label class="option block mn">
+                                                    <input type="checkbox" name="mobileos" value="FR">
+                                                    <span class="checkbox mn"></span>
+                                                </label>
+                                            </td>
+                                            <td style="padding-left: 100px;">单身派对</td>
+                                            <td></td>
+                                            <td>
+                                                <a href="catalog_list.html?id=14103">删除</a>
+                                            </td>
+                                        </tr>
+                                    
+                                
+                                    <tr class="message-unread">
+                                        <td class="hidden-xs">
+                                            <label class="option block mn">
+                                                <input type="checkbox" name="mobileos" value="FR">
+                                                <span class="checkbox mn"></span>
+                                            </label>
+                                        </td>
+                                        <td style="padding-left: 50px;">纪念</td>
+                                        <td></td>
+                                        <td>
+                                            <a href="catalog_list.html?id=14200">删除</a>
+                                        </td>
+                                    </tr>
+                                    
+                                        <tr class="message-unread">
+                                            <td class="hidden-xs">
+                                                <label class="option block mn">
+                                                    <input type="checkbox" name="mobileos" value="FR">
+                                                    <span class="checkbox mn"></span>
+                                                </label>
+                                            </td>
+                                            <td style="padding-left: 100px;">组织庆典</td>
+                                            <td></td>
+                                            <td>
+                                                <a href="catalog_list.html?id=14201">删除</a>
+                                            </td>
+                                        </tr>
+                                    
+                                        <tr class="message-unread">
+                                            <td class="hidden-xs">
+                                                <label class="option block mn">
+                                                    <input type="checkbox" name="mobileos" value="FR">
+                                                    <span class="checkbox mn"></span>
+                                                </label>
+                                            </td>
+                                            <td style="padding-left: 100px;">活动仪式</td>
+                                            <td></td>
+                                            <td>
+                                                <a href="catalog_list.html?id=14202">删除</a>
+                                            </td>
+                                        </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</section>
+
+
+</div>
+<style>
+    /* demo page styles */
+    body { min-height: 2300px; }
+
+    .content-header b,
+    .admin-form .panel.heading-border:before,
+    .admin-form .panel .heading-border:before {
+        transition: all 0.7s ease;
+    }
+    /* responsive demo styles */
+    @media (max-width: 800px) {
+        .admin-form .panel-body { padding: 18px 12px; }
+    }
+</style>
+
+<style>
+    .ui-datepicker select.ui-datepicker-month,
+    .ui-datepicker select.ui-datepicker-year {
+        width: 48%;
+        margin-top: 0;
+        margin-bottom: 0;
+
+        line-height: 25px;
+        text-indent: 3px;
+
+        color: #888;
+        border-color: #DDD;
+        background-color: #FDFDFD;
+
+        -webkit-appearance: none; /*Optionally disable dropdown arrow*/
+    }
+</style>
+
+<!-- jQuery -->
+<script src="../js/jquery.min.js"></script>
+<script src="../js/jquery-ui.min.js"></script>
+<!-- Theme Javascript -->
+<script src="../js/utility.js"></script>
+<script src="../js/demo/demo.js"></script>
+<script src="../js/main.js"></script>
+<script src="../js/pages.js"></script>
+<!-- END: PAGE SCRIPTS -->
+</body>
+
+
+</html>
