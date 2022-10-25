@@ -1,3 +1,7 @@
+![telegram-cloud-photo-size-5-6249201528082641150-x](/Users/wh37/Library/Group Containers/6N38VWS5BX.ru.keepcoder.Telegram/stable/account-603578246170668601/postbox/media/telegram-cloud-photo-size-5-6249201528082641150-x.jpg)
+
+
+
 ufcnation.net
 
 有个趋势图，我想要做成这样的，但是不知道数据怎么处理，你打开他的控制台看到trends这个请求，就是数据结构
