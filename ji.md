@@ -29,7 +29,7 @@ side: 3 DRAW 绿色
         }
 
         $data = Cache::store('redis')->get('trends');
-        
+
         if (!empty($data)) {
             $num = Cache::store('redis')->get('trendsNum');
             $data = json_decode($data, true);
@@ -48,6 +48,10 @@ side: 3 DRAW 绿色
                                     $data[0][$j + 1]['num'] = $num;
                                     $data[0][$j + 1]['side'] = $side;
                                 } else {
+                                    if (empty($data[$i + 1][$j])) {
+                                        $data[$i + 1][$j]['num'] = null;
+                                        $data[$i + 1][$j]['side'] = 0;
+                                    }
                                     if ($data[$i + 1][$j]['num'] == NULL) {
                                         $num = $num + 1;
                                         $data[$i + 1][$j]['num'] = $num;
@@ -110,6 +114,5 @@ side: 3 DRAW 绿色
         }
         return $side;
     }
-
 ```
 
