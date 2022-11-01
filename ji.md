@@ -16,6 +16,10 @@ side: 2 WALA 蓝色
 
 side: 3 DRAW 绿色
 
+
+
+表字段 game_num  winner(1红色 2蓝色 3平局 4取消)
+
 ```php
     // 有新数据时调用
     public function updateTrends()
@@ -114,5 +118,97 @@ side: 3 DRAW 绿色
         }
         return $side;
     }
+```
+
+
+
+```php
+   public function getTrends()
+    {
+        // 查询最新的N条数据
+        $res = Db::table('ji_test')->field(["game_num", "winner"])->order('created_at', 'ASC')->limit(100)->select()->toArray();
+
+        // 初始化数组
+        $data = [];
+        for ($i = 0; $i < 6; $i++) {
+            for ($j = 0; $j < count($res); $j++) {
+                $data[$i][$j]['num'] = null;
+                $data[$i][$j]['winner'] = 0;
+            }
+        }
+
+        // 将$res的数据存入$data
+        foreach ($res as $arr) {
+            $winner = $arr['winner'];
+            $num = $arr['game_num'];
+            $data = $this->saveToData($data, $winner, $num);
+        }
+
+        // 删除空数据
+        $len = 0;
+        for ($i = 0; $i < count($data[0]); $i++) {
+            if ($data[0][$i]['num'] != null) {
+                $len++;
+            }
+        }
+        for ($i = 0; $i < count($data); $i++) {
+            $data[$i] = array_slice($data[$i], 0, $len);
+        }
+
+        echo json_encode($data);
+    }
+
+    public function saveToData($data, $winner, $num)
+    {
+        if ($data[0][0]['num'] == null) {
+            $data[0][0]['num'] = $num;
+            $data[0][0]['winner'] = $winner;
+            return $data;
+        }
+
+        for ($i = 0; $i < 6; $i++) {
+            for ($j = 0; $j < count($data[$i]); $j++) {
+                // 当前行列不为null，并且为最后一列
+                if ($data[$i][$j]['num'] != null && empty($data[$i][$j + 1]['num'])) {
+                    // 如果已经到最后一行，则在新的一列存数据
+                    if ($i == 5) {
+                        $data[0][$j + 1]['num'] = $num;
+                        $data[0][$j + 1]['winner'] = $winner;
+                        return $data;
+                    }
+                    // 如果下一行的数据是null
+                    if ($data[$i + 1][$j]['num'] == null) {
+                        if ($data[$i][$j]['winner'] == $winner) {
+                            // 1.当前行列的winner等于新的winner 就在下一行存数据
+                            $data[$i + 1][$j]['num'] = $num;
+                            $data[$i + 1][$j]['winner'] = $winner;
+                        } else {
+                            // 2.当前行列的winner 不等于新的winner 就在下一列的第一行存数据
+                            $data[0][$j + 1]['num'] = $num;
+                            $data[0][$j + 1]['winner'] = $winner;
+                        }
+                        return $data;
+                    }
+                }
+            }
+        }
+        return $data;
+    }
+
+```
+
+
+
+```
+
+//        for ($i = 1; $i < 200; $i++) {
+//            $where['game_num'] = $i;
+//            $arr = [1,1,1,1,1,1,1,1,2,2,2,2,2,2,2,2,3,4];
+//            $index = array_rand($arr);
+////            $data['created_at'] = date('Y-m-d H:i:s');
+//            $data['winner'] = $arr[$index];
+//            Db::table('ji_test')->where($where)->update($data);
+////            sleep(1);
+//        }
 ```
 
