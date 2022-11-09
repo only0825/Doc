@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>websocket demo</title>
+</head>
+
+<body onload="connect();">
+
+<!-- 发送消息 -->
+<button onclick="onSubmit()" type="button" id="submit">Click Me!</button>
+<button onclick="onFor()" type="button">For Me!</button>
+
+</body>
+
+<script>
+
+    let num = 1;
+
+    var ws, client_list = {}, room_id, client_id;
+    let member_id = 1000006;
+    let signature = "8bfd39783050fbc04cab793e6ca20d17";
+
+    room_id = getQueryString('room_id') ? getQueryString('room_id') : 2000100;
+
+    function getQueryString(name) {
+        var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)", "i");
+        var r = window.location.search.substr(1).match(reg);
+        if (r != null) return unescape(r[2]);
+        return null;
+    }
+
+    // 连接服务端
+    function connect() {
+        // 创建websocket
+        // ws = new WebSocket("ws://localhost:2348");
+        ws = new WebSocket("ws://ws.wuhaicj.com/wss");
+        // 当socket连接打开时，输入用户名
+        ws.onopen = onopen;
+        // 当有消息时根据消息类型显示不同信息
+        ws.onmessage = onmessage;
+        ws.onclose = function () {
+            console.log("连接关闭，定时重连");
+            connect();
+        };
+        ws.onerror = function () {
+            console.log("出现错误");
+        };
+    }
+
+    // 连接建立时发送登录信息
+    function onopen() {
+        // 登录
+        var login_data = '{"type":"1010","device":"PC","member_id":"' + member_id + '","room_id":' + room_id + ' ,"signature":\"' + signature + '\"}';
+        // var login_data = '{"type":"1010","device":"PC","member_id":"","room_id":'+room_id+'}'; // 游客
+        console.log("websocket握手成功，发送登录数据:" + login_data);
+        ws.send(login_data);
+    }
+
+    function onFor() {
+        setInterval(function () {
+            var buy = document.getElementById('submit');//给你的a标签加一个id :btnBuy
+            buy.click();
+            num++
+        }, 3000)//后面的500是以毫秒为单位。
+    }
+
+    // 提交对话
+    function onSubmit() {
+        console.log("submit")
+        ws.send('{"type":"1040","device":"PC","member_id":"' + member_id + '","msg":"Hello World' + num + '","room_id":' + room_id + ' ,"signature":\"' + signature + '\"}');
+    }
+
+    // 服务端发来消息时
+    function onmessage(e) {
+        var data = JSON.parse(e.data);
+        console.log(data['type'])
+        switch (data['type']) {
+            // 服务端ping客户端
+            case 'ping':
+                ws.send('{"type":"ping"}');
+                break;
+            // 登录 更新用户列表
+            case '1010':
+                console.log(data)
+                break;
+            // 系统公告
+            case '1120':
+                console.log(data['content']['msg'])
+                break;
+            // 发言
+            case '1040':
+                //{"type":"say","from_client_id":xxx,"to_client_id":"all/client_id","content":"xxx","time":"xxx"}
+                //console.log(data['nickname'] + " say:"+ data['content']['msg'])
+                console.log(data)
+                break;
+            // 用户被禁言
+            case '1071':
+                console.log("又有用户被禁言了")
+                console.log(data)
+                break;
+            // 被禁言的用户发言后的回调
+            case '1072':
+                console.log("你已被禁言")
+                console.log(data)
+                break;
+            case '2010':
+                alert("未登陆")
+                break;
+            // 用户退出 更新用户列表
+            case 'logout':
+                //{"type":"logout","client_id":xxx,"time":"xxx"}
+                say(data['from_client_id'], data['from_client_name'], data['from_client_name'] + ' 退出了', data['time']);
+                delete client_list[data['from_client_id']];
+                flush_client_list();
+                break;
+        }
+    }
+
+    // "海牛会员2"
+
+
+</script>
+
+</html>
