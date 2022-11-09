@@ -6,33 +6,56 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.Scanner;
 
 public class Test {
 
-    public static void main(String[] args) throws ParseException {
-
-        // JDK7
-        // 规则：只要对时间进行计算或者判断，都需要获取当前时间的毫秒值
-        //1. 计算出生年月日的毫秒值
-        String birthday = "2000年1月1日";
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy年MM月dd日");
-        Date date = sdf.parse(birthday);
-        long birthdayTime = date.getTime();
-        //2. 获取当前时间的毫秒值
-        long todayTime = System.currentTimeMillis();
-        //3. 计算间隔多少天
-        long time = todayTime - birthdayTime;
-        System.out.println(time / 1000 / 60 / 60 / 24);
-
-        // JDK8
-        LocalDate ld1 = LocalDate.of(2000, 1, 1);
-        LocalDate ld2 = LocalDate.now();
-
-        long days = ChronoUnit.DAYS.between(ld1, ld2);
-        System.out.println(days);
+    public static void main(String[] args) {
+        int[] arr = {1, 3, 44, 55, 67, 88, 99, 111, 3333};
+        int index = binarySearch(arr, 44);
+        System.out.println(index);
     }
 
+    public static int binarySearch(int[] arr, int number) {
+        int min = 0;
+        int max = arr.length - 1;
 
+        while (true) {
+            // 查找数组中间的索引
+            int mid = (min + max) / 2;
+             if (arr[mid] > number) {
+                // 如果该索引的元素大于查找的number  x就为结束索引
+                 max = mid;
+            } else {
+                // 如果该索引的元素小于查找的number  x就为开始索引
+                 min = mid;
+            }
+            if (arr[mid] == number) {
+                return mid;
+            }
+        }
+
+
+//        System.exit(0);
+//        int index;
+//        int start;
+//        int end;
+//        while (true) {
+//            int len = arr.length;
+//            index = len / 2;
+//            if (index == 0) {
+//                break;
+//            }
+//            System.out.println(index);
+//            System.out.println(arr[index]);
+//            System.out.println("==========");
+//            if (arr[index] > number) {
+//                arr = Arrays.copyOfRange(arr, index, len);
+//            } else {
+//                arr = Arrays.copyOfRange(arr, 0, index);
+//            }
+//        }
+    }
 }
