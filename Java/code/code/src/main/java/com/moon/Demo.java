@@ -1,33 +1,24 @@
 package com.moon;
 
-
-import com.sun.org.apache.xerces.internal.impl.dv.util.Base64;
+import java.lang.annotation.Native;
+import java.lang.reflect.Field;
+import java.util.*;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
 public class Demo {
+    public static final int   MAX_VALUE = 0x7fffffff;
+    private static final int MAX_ARRAY_SIZE = MAX_VALUE - 8;
+
 
     public static void main(String[] args) {
-        String base_data = "conv_time=1668768912201&client_ip=127.0.0.1&ua=Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36&sign=962f27d4963026c8b3118c7f09d3bb9a";
-        String encrypt_key = "QeRRNxxlsSlFjgJD";
-        String res = encrypt(base_data, encrypt_key);
-        System.out.println(res);
+
     }
 
-    public static String encrypt(String base_data, String key) {
-        try {
-            if (base_data.isEmpty() || key.isEmpty()) {
-                return null;
-            }
-
-            char[] infoChar = base_data.toCharArray();
-            char[] keyChar = key.toCharArray();
-
-            byte[] resultChar = new byte[infoChar.length];
-            for (int i = 0; i < infoChar.length; i++) {
-                resultChar[i] = (byte) ((infoChar[i] ^ keyChar[i % keyChar.length]) & 0xFF);
-            }
-            return Base64.encode(resultChar);
-        } catch (Exception e) {
-            return null;
-        }
+    static int getCapacity(List al) throws Exception {
+        Field field = ArrayList.class.getDeclaredField("elementData");
+        field.setAccessible(true);
+        return ((Object[]) field.get(al)).length;
     }
+
 }
