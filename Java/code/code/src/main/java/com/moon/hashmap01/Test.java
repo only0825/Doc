@@ -1,8 +1,6 @@
 package com.moon.hashmap01;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.function.BiConsumer;
 
 public class Test {
@@ -60,5 +58,10 @@ public class Test {
                 System.out.println(s + ":" + integer);
             }
         });
+
+        ArrayList<Integer> list = new ArrayList<>();
+        Collections.addAll(list, 1, 2, 3, 4, 5);
+        Collections.fill(list, 100);
+        System.out.println(list);
     }
 }
