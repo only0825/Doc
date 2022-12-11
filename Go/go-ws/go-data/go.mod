@@ -3,7 +3,7 @@ module go-data
 go 1.19
 
 require (
-	github.com/go-redis/redis/v8 v8.11.5
+	github.com/go-redis/redis/v9 v9.0.0-rc.2
 	gorm.io/driver/mysql v1.4.4
 	gorm.io/gorm v1.24.2
 )

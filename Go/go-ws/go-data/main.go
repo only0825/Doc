@@ -1,49 +1,32 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
-	"github.com/go-redis/redis/v8"
-	"gorm.io/driver/mysql"
-	"gorm.io/gorm"
-	"io/ioutil"
+	"go-data/common"
+	"go-data/model"
 	"net/http"
 	"time"
 )
 
+type Content struct {
+	id      int
+	title   string
+	content string
+}
+
 var m = make(map[string]interface{})
 
-var rdb *redis.Client
+func init() {
+	common.InitRedisCluster()
+	common.InitDb()
+}
 
 func main() {
 	//go oddsChange()
-	scoreChange()
-}
+	//model.ScoreChange()
 
-func scoreChange() {
-	for {
-		time.Sleep(time.Duration(3) * time.Second)
-		res, err := http.Get("http://api.wuhaicj.com/api/liveScore/change")
-		if err != nil {
-			fmt.Println("URL Request failed:", err)
-			break
-		}
-		msg, err := ioutil.ReadAll(res.Body)
-		if err != nil {
-			fmt.Println("Read body failed:", err)
-			break
-		}
-		// 将json消息转为数组
-		err = json.Unmarshal(msg, &m)
-		if err != nil {
-			fmt.Println("err :", err)
-			break
-		}
-
-		fmt.Println(m["changeList"])
-		defer res.Body.Close()
-	}
-
+	str := "{\"changeList\":[{\"matchId\":2318090,\"state\":3,\"homeScore\":0,\"awayScore\":1,\"homeHalfScore\":0,\"awayHalfScore\":1,\"homeRed\":0,\"awayRed\":0,\"homeYellow\":0,\"awayYellow\":0,\"homeCorner\":0,\"awayCorner\":0,\"hasLineup\":\"\",\"matchTime\":\"2022-12-11 18:45:00\",\"startTime\":\"2022-12-11 19:56:57\",\"explain\":\"\",\"extraExplain\":\"\",\"injuryTime\":\"\"},{\"matchId\":2267198,\"state\":3,\"homeScore\":3,\"awayScore\":0,\"homeHalfScore\":2,\"awayHalfScore\":0,\"homeRed\":0,\"awayRed\":0,\"homeYellow\":2,\"awayYellow\":2,\"homeCorner\":3,\"awayCorner\":3,\"hasLineup\":\"\",\"matchTime\":\"2022-12-11 19:00:00\",\"startTime\":\"2022-12-11 20:02:13\",\"explain\":\"\",\"extraExplain\":\"\",\"injuryTime\":\"\"},{\"matchId\":2286901,\"state\":3,\"homeScore\":2,\"awayScore\":3,\"homeHalfScore\":0,\"awayHalfScore\":2,\"homeRed\":0,\"awayRed\":0,\"homeYellow\":2,\"awayYellow\":3,\"homeCorner\":5,\"awayCorner\":0,\"hasLineup\":\"\",\"matchTime\":\"2022-12-11 19:00:00\",\"startTime\":\"2022-12-11 20:06:13\",\"explain\":\"\",\"extraExplain\":\"\",\"injuryTime\":\"\"},{\"matchId\":2318072,\"state\":3,\"homeScore\":0,\"awayScore\":1,\"homeHalfScore\":0,\"awayHalfScore\":0,\"homeRed\":0,\"awayRed\":0,\"homeYellow\":0,\"awayYellow\":1,\"homeCorner\":1,\"awayCorner\":4,\"hasLineup\":\"\",\"matchTime\":\"2022-12-11 19:00:00\",\"startTime\":\"2022-12-11 20:06:42\",\"explain\":\"\",\"extraExplain\":\"\",\"injuryTime\":\"\"},{\"matchId\":2318119,\"state\":3,\"homeScore\":3,\"awayScore\":1,\"homeHalfScore\":2,\"awayHalfScore\":0,\"homeRed\":0,\"awayRed\":0,\"homeYellow\":4,\"awayYellow\":1,\"homeCorner\":4,\"awayCorner\":8,\"hasLineup\":\"\",\"matchTime\":\"2022-12-11 19:00:00\",\"startTime\":\"2022-12-11 20:00:15\",\"explain\":\"\",\"extraExplain\":\"\",\"injuryTime\":\"\"}]}"
+	model.UpdateScore(str)
 }
 
 func oddsChange() {
@@ -56,26 +39,4 @@ func oddsChange() {
 		}
 		fmt.Println(res)
 	}
-}
-
-func init() {
-	rdb = redis.NewClient(&redis.Options{
-		Addr:         "localhost:6379",
-		Password:     "", // no password set
-		DB:           0,  // use default DB
-		PoolSize:     15,
-		MinIdleConns: 10, //在启动阶段创建指定数量的Idle连接，并长期维持idle状态的连接数不少于指定数量；。
-	})
-
-	db, err := gorm.Open(mysql.New(mysql.Config{
-		DSN:                       "gorm:gorm@tcp(127.0.0.1:3306)/gorm?charset=utf8&parseTime=True&loc=Local", // DSN data source name
-		DefaultStringSize:         256,                                                                        // string 类型字段的默认长度
-		DisableDatetimePrecision:  true,                                                                       // 禁用 datetime 精度，MySQL 5.6 之前的数据库不支持
-		DontSupportRenameIndex:    true,                                                                       // 重命名索引时采用删除并新建的方式，MySQL 5.7 之前的数据库和 MariaDB 不支持重命名索引
-		DontSupportRenameColumn:   true,                                                                       // 用 `change` 重命名列，MySQL 8 之前的数据库和 MariaDB 不支持重命名列
-		SkipInitializeWithVersion: false,                                                                      // 根据当前 MySQL 版本自动配置
-	}), &gorm.Config{})
-
-	fmt.Println(db)
-	fmt.Println(err)
 }
