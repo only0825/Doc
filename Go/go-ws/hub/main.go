@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"io/ioutil"
+	"io"
 	"log"
 	"net/http"
 	"os"
@@ -82,7 +82,7 @@ func oddsChange(user *User) {
 			logger.Println("URL Request failed:", err)
 			break
 		}
-		msg, err := ioutil.ReadAll(res.Body)
+		msg, err := io.ReadAll(res.Body)
 		if err != nil {
 			logger.Println("Read body failed:", err)
 			break
