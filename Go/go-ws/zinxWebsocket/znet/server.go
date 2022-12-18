@@ -1,14 +1,13 @@
 package znet
 
 import (
+	"github.com/gorilla/websocket"
 	// "errors"
 	"log"
 	"net/http"
 	"strconv"
 	"zinxWebsocket/utils"
 	"zinxWebsocket/ziface"
-
-	"github.com/gorilla/websocket"
 )
 
 // 服务器实现 ws://127.0.0.1:8080/echo

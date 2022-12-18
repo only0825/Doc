@@ -37,7 +37,7 @@
     // 连接服务端
     function connect() {
         // 创建websocket
-        ws = new WebSocket("ws://127.0.0.1:8999");
+        ws = new WebSocket("ws://127.0.0.1:6031/score");
         // 当socket连接打开时，输入用户名
         ws.onopen = onopen;
         // 当有消息时根据消息类型显示不同信息

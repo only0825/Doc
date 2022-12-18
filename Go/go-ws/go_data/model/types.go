@@ -7,8 +7,8 @@ type ChangeList struct {
 type Change struct {
 	MatchId       int    `json:"matchId"`       // 比赛ID
 	State         int    `json:"state"`         // 比赛
-	HomeScore     int    `json:"homeScore"`     // 主队得分
-	AwayScore     int    `json:"awayScore"`     // 客队得分
+	HomeScore     string `json:"homeScore"`     // 主队得分
+	AwayScore     string `json:"awayScore"`     // 客队得分
 	HomeHalfScore int    `json:"homeHalfScore"` // 主队上半场得分
 	AwayHalfScore int    `json:"awayHalfScore"` // 客队上半场得分
 	HomeRed       int    `json:"homeRed"`       // 主队红牌数

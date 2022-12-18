@@ -1,17 +1,16 @@
 package main
 
 import (
+	"github.com/robfig/cron/v3"
 	"go_data/common"
 	"go_data/logger"
 	"go_data/model"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"net/http"
-	"time"
 )
 
 func init() {
-
 	rdbc, err := common.InitRedisCluster()
 	if err != nil {
 		logger.Error.Println("Redis初始化失败: ", err)
@@ -30,11 +29,36 @@ func init() {
 	model.Rdbc = rdbc
 }
 
+// 返回一个支持至 秒 级别的 cron
+func newWithSeconds() *cron.Cron {
+	secondParser := cron.NewParser(cron.Second | cron.Minute |
+		cron.Hour | cron.Dom | cron.Month | cron.DowOptional | cron.Descriptor)
+	return cron.New(cron.WithParser(secondParser), cron.WithChain())
+}
+
 func main() {
 	//go oddsChange()
-	//
-	//j := "{\"changeList\":[]}"
-	//fmt.Println(j)
+
+	i := 0
+	c := newWithSeconds()
+	//AddFunc
+	spec := "*/5 * * * * ?"
+	c.AddFunc(spec, func() {
+		i++
+		logger.Info.Println("cron running:", i)
+	})
+
+	//AddJob方法
+	c.AddJob(spec, model.TaskScoreFootball{})
+	//c.AddJob(spec, model.TaskScoreBasketBall{})
+
+	//启动计划任务
+	c.Start()
+
+	//关闭着计划任务, 但是不能关闭已经在执行中的任务.
+	defer c.Stop()
+
+	select {}
 
 	// 实时比分
 	//go model.ScoreChange("http://api.wuhaicj.com/api/liveScore/change2", common.BasketBall)
@@ -42,13 +66,10 @@ func main() {
 }
 
 func oddsChange() {
-	for {
-		time.Sleep(time.Duration(3) * time.Second)
-		res, err := http.Get("http://api.wuhaicj.com/api/liveScore/oddsChange")
-		if err != nil {
-			logger.Error.Println("URL Request failed:", err)
-			break
-		}
-		logger.Info.Println(res)
+	res, err := http.Get("http://api.wuhaicj.com/api/liveScore/oddsChange")
+	if err != nil {
+		logger.Error.Println("URL Request failed:", err)
+		return
 	}
+	logger.Info.Println(res)
 }

@@ -12,12 +12,12 @@ import (
 	"zinxWebsocket/znet"
 )
 
-//测试路由
+// 测试路由
 type PingRouter struct {
 	znet.BaseRouter
 }
 
-//处理业务
+// 处理业务
 func (br *PingRouter) Handle(request ziface.IRequest) {
 	//unmarsh
 	msg := &message.Account{}
@@ -52,7 +52,7 @@ func (br *PingRouter) Handle(request ziface.IRequest) {
 	request.GetConnection().SendBuffMsg("服务器unix时间:" + strconv.Itoa(int(time.Now().Unix())))
 }
 
-//回写数据
+// 回写数据
 type RepeatRouter struct {
 	znet.BaseRouter
 }
@@ -67,7 +67,7 @@ func (br *RepeatRouter) Handle(request ziface.IRequest) {
 	log.Println("RepeatRouter Handle receive from msg:", request.GetData())
 }
 
-//回调之后
+// 回调之后
 func DoConectionBegin(conn ziface.IConnection) {
 	log.Println("DoConectionBegin is called connid:", conn.GetConnID())
 	conn.SendMsg("我在连接开始后的第一个消息")
@@ -89,7 +89,7 @@ func DoConectionEnd(conn ziface.IConnection) {
 	}
 }
 
-//超出最大连接回调
+// 超出最大连接回调
 func MaxConection(conn *websocket.Conn) {
 	log.Println("MaxConection is called connip:", conn.RemoteAddr().String())
 	conn.WriteMessage(websocket.TextMessage, []byte("好好呀MaxConection"))
@@ -99,18 +99,18 @@ func main() {
 	//创建一个实例
 	s := znet.NewServer()
 
-	//注意连接回调
-	s.SetOnConnStart(DoConectionBegin)
-	s.SetOnConnStop(DoConectionEnd)
-
-	//最大连接
-	s.SetOnMaxConn(MaxConection)
-
-	//回写测试
-	s.SetRouter(&RepeatRouter{})
-
-	//返回消息测试
-	s.SetRouter(&PingRouter{})
+	////注意连接回调
+	//s.SetOnConnStart(DoConectionBegin)
+	//s.SetOnConnStop(DoConectionEnd)
+	//
+	////最大连接
+	//s.SetOnMaxConn(MaxConection)
+	//
+	////回写测试
+	//s.SetRouter(&RepeatRouter{})
+	//
+	////返回消息测试
+	//s.SetRouter(&PingRouter{})
 
 	//启动
 	s.Serve()

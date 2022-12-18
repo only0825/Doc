@@ -4,7 +4,7 @@
     "Port":8999,
     "Scheme":"ws",
     "Path":"",
-    "MaxConn":3,
+    "MaxConn":1000,
     "MaxPackageSize":4096,
     "WorkerPoolSize":4,
     "MaxMsgChanLen":10
