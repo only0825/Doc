@@ -2,6 +2,7 @@ package znet
 
 import (
 	"fmt"
+	"go-ws/zinx_study/zinx/utils"
 	"go-ws/zinx_study/zinx/ziface"
 	"net"
 	"time"
@@ -17,13 +18,46 @@ type Server struct {
 	IP string
 	//服务绑定的端口
 	Port int
+	//当前Server由用户绑定的回调router,也就是Server注册的链接对应的处理业务
+	Router ziface.IRouter
 }
+
+/*
+创建一个服务器句柄
+*/
+func NewServer(name string) ziface.IServer {
+	//先初始化全局配置文件
+	utils.GlobalObject.Reload()
+	s := &Server{
+		Name:      utils.GlobalObject.Name, //从全局参数获取
+		IPVersion: "tcp4",
+		IP:        utils.GlobalObject.Host,    //从全局参数获取
+		Port:      utils.GlobalObject.TcpPort, //从全局参数获取
+		Router:    nil,
+	}
+	return s
+}
+
+// ============== 定义当前客户端链接的handle api ===========
+//func CallBackToClient(conn *net.TCPConn, data []byte, cnt int) error {
+//	//回显业务
+//	fmt.Println("[Conn Handle] CallBackToClient ... " + conn.RemoteAddr().String())
+//	if _, err := conn.Write(data[:cnt]); err != nil {
+//		fmt.Println("write back buf err ", err)
+//		return errors.New("CallBackToClient error")
+//	}
+//	return nil
+//}
 
 //============== 实现 ziface.IServer 里的全部接口方法 ========
 
 // 开启网络服务
 func (s *Server) Start() {
-	fmt.Printf("[START] Server listenner at IP: %s, Port %d, is starting\n", s.IP, s.Port)
+	fmt.Printf("[START] Server name: %s,listenner at IP: %s, Port %d is starting\n", s.Name, s.IP, s.Port)
+	fmt.Printf("[Zinx] Version: %s, MaxConn: %d,  MaxPacketSize: %d\n",
+		utils.GlobalObject.Version,
+		utils.GlobalObject.MaxConn,
+		utils.GlobalObject.MaxPacketSize)
 
 	//开启一个go去做服务端Linster业务
 	go func() {
@@ -44,6 +78,10 @@ func (s *Server) Start() {
 		//已经监听成功
 		fmt.Println("start Zinx server  ", s.Name, " succ, now listenning...")
 
+		//TODO server.go 应该有一个自动生成ID的方法
+		var cid uint32
+		cid = 0
+
 		//3 启动server网络连接业务
 		for {
 			//3.1 阻塞等待客户端建立连接请求
@@ -55,25 +93,12 @@ func (s *Server) Start() {
 
 			//3.2 TODO Server.Start() 设置服务器最大连接控制,如果超过最大连接，那么则关闭此新的连接
 
-			//3.3 TODO Server.Start() 处理该新连接请求的 业务 方法， 此时应该有 handler 和 conn是绑定的
+			//3.3 Server.Start() 处理该新连接请求的 业务 方法， 此时应该有 handler 和 conn是绑定的
+			dealConn := NewConnection(conn, cid, s.Router)
+			cid++
 
-			//我们这里暂时做一个最大512字节的回显服务
-			go func() {
-				//不断的循环从客户端获取数据
-				for {
-					buf := make([]byte, 512)
-					cnt, err := conn.Read(buf)
-					if err != nil {
-						fmt.Println("recv buf err ", err)
-						continue
-					}
-					//回显
-					if _, err := conn.Write(buf[:cnt]); err != nil {
-						fmt.Println("write back buf err ", err)
-						continue
-					}
-				}
-			}()
+			//3.4 启动当前链接的处理业务
+			go dealConn.Start()
 		}
 	}()
 }
@@ -95,16 +120,9 @@ func (s *Server) Serve() {
 	}
 }
 
-/*
-创建一个服务器句柄
-*/
-func NewServer(name string) ziface.IServer {
-	s := &Server{
-		Name:      name,
-		IPVersion: "tcp4",
-		IP:        "0.0.0.0",
-		Port:      7777,
-	}
+// 路由功能：给当前服务注册一个路由业务方法，供客户端链接处理使用
+func (s *Server) AddRouter(router ziface.IRouter) {
+	s.Router = router
 
-	return s
+	fmt.Println("Add Router succ! ")
 }

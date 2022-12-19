@@ -5,6 +5,7 @@ import (
 	"github.com/gorilla/websocket"
 	"log"
 	"net/http"
+	"zinx_ws/utils"
 	"zinx_ws/ziface"
 )
 
@@ -20,6 +21,15 @@ type Server struct {
 	Port string
 	//协议
 	Path string
+	//当前Server由用户绑定的回调router,也就是Server注册的链接对应的处理业务
+	Router ziface.IRouter
+}
+
+// 路由功能：给当前服务注册一个路由业务方法，供客户端链接处理使用
+func (s *Server) AddRouter(router ziface.IRouter) {
+	s.Router = router
+
+	fmt.Println("Add Router succ! ")
 }
 
 // 连接信息
@@ -32,6 +42,9 @@ var upgrader = websocket.Upgrader{
 	},
 }
 
+// 全局conectionid 后续使用uuid生成
+var cid uint32
+
 // websocket回调
 func (s *Server) wsHandler(w http.ResponseWriter, r *http.Request) {
 	conn, err := upgrader.Upgrade(w, r, nil)
@@ -41,29 +54,23 @@ func (s *Server) wsHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	log.Println("server wsHandler a new client coming ip:", conn.RemoteAddr())
-
-	go func() {
-		for {
-			_, msg, err := conn.ReadMessage()
-			if err != nil {
-				conn.Close()
-				break
-			}
-			conn.WriteMessage(1, msg)
-		}
-	}()
 	//处理新连接业务方法
+	dealConn := NewConnection(conn, cid)
+	go dealConn.Start()
+	cid++
 }
 
 // 启动
 func (s *Server) Start() {
-	fmt.Printf("[START] Server listenner at IP: %s, Port %s, is starting\n", s.IP, s.Port)
+	fmt.Printf("[START] Server name: %s,listenner at IP: %s, Port %d is starting\n", s.Name, s.IP, s.Port)
+	fmt.Printf("[Zinx] Version: %s, MaxConn: %d,  MaxPacketSize: %d\n",
+		utils.GlobalObject.Version,
+		utils.GlobalObject.MaxConn,
+		utils.GlobalObject.MaxPacketSize)
 
 	//开启一个go去做服务端Linster业务
-	//http.HandleFunc("/"+s.Path, s.wsHandler)
-	http.HandleFunc("/score", s.wsHandler)
-	//err := http.ListenAndServe(s.IP+":"+s.Port, nil)
-	err := http.ListenAndServe(":6031", nil)
+	http.HandleFunc("/"+s.Path, s.wsHandler)
+	err := http.ListenAndServe(s.IP+":"+s.Port, nil)
 	if err != nil {
 		log.Println("server start listen error:", err)
 	}
@@ -90,12 +97,15 @@ func (s *Server) Serve() {
 创建一个服务器句柄
 */
 func NewServer() ziface.IServer {
+	//先初始化全局配置文件
+	utils.GlobalObject.Reload()
+
 	s := &Server{
-		Name:   "zinx websocket",
-		Scheme: "ws",
-		IP:     "0.0.0.0",
-		Port:   "6379",
-		Path:   "",
+		Name:   utils.GlobalObject.Name, //从全局参数获取
+		Scheme: "tcp4",
+		IP:     utils.GlobalObject.Host, //从全局参数获取
+		Port:   utils.GlobalObject.Port, //从全局参数获取
+		Router: nil,
 	}
 	return s
 }

@@ -11,43 +11,33 @@ import (
 	"github.com/gorilla/websocket"
 )
 
-//连接管理
+// 连接管理
 type Connection struct {
 	//当前属于那个server
 	WsServer ziface.IServer
-
 	//当前连接的ws
 	Conn *websocket.Conn
-
 	//连接id
 	ConnID uint32
-
 	//当前连接状态
 	isClosed bool
-
 	//告知当前连接已经退出/停止,由reder退出的信号
 	ExitChan chan bool
-
 	//无缓冲读写通信
 	msgChan chan string
-
 	//有缓冲读写通信
 	msgBuffChan chan string
-
 	//路由管理,用来绑定msgid与api关系
 	MsgHandle ziface.IMsgHandle
-
 	//绑定属性
 	property map[string]interface{}
-
 	//保护连接属性
 	propertyLock sync.RWMutex
-
 	//消息类型 TextMessage 或 BinaryMessage之类
 	messageType int `json:"messageType"`
 }
 
-//初始化连接方法
+// 初始化连接方法
 func NewConnection(server ziface.IServer, conn *websocket.Conn, connID uint32, mh ziface.IMsgHandle) *Connection {
 	c := &Connection{
 		WsServer:    server,
@@ -68,7 +58,7 @@ func NewConnection(server ziface.IServer, conn *websocket.Conn, connID uint32, m
 	return c
 }
 
-//读业务
+// 读业务
 func (c *Connection) StartReader() {
 	log.Println("connection StartReader start connid:", c.ConnID)
 	defer log.Println("connection StartReader exit connid:", c.ConnID, " remoteip:", c.Conn.RemoteAddr())
@@ -101,7 +91,7 @@ func (c *Connection) StartReader() {
 	}
 }
 
-//写业务,专门发给客户端
+// 写业务,专门发给客户端
 func (c *Connection) StartWriter() {
 	log.Println("connection StartWriter start")
 	defer log.Println("connection StartWriter exit connid:", c.ConnID, " remoteip:", c.Conn.RemoteAddr())
@@ -136,7 +126,7 @@ func (c *Connection) StartWriter() {
 	}
 }
 
-//启动连接，让当前连接，开始工作
+// 启动连接，让当前连接，开始工作
 func (c *Connection) Start() {
 	log.Println("connection Start connid:", c.ConnID)
 
@@ -151,7 +141,7 @@ func (c *Connection) Start() {
 	c.WsServer.CallOnConnStart(c)
 }
 
-//停止连接，结束当前连接工作
+// 停止连接，结束当前连接工作
 func (c *Connection) Stop() {
 	log.Println("connection stop start connid:", c.ConnID, " remoteAddr:", c.RemoteAddr())
 	//如是已经关闭
@@ -178,22 +168,22 @@ func (c *Connection) Stop() {
 	log.Println("connection stop end connid:", c.ConnID, " isClosed:", c.isClosed)
 }
 
-//获取当前连接的websocket conn
+// 获取当前连接的websocket conn
 func (c *Connection) GetWsConnection() *websocket.Conn {
 	return c.Conn
 }
 
-//获取当前连接的id
+// 获取当前连接的id
 func (c *Connection) GetConnID() uint32 {
 	return c.ConnID
 }
 
-//获取连接客户端的信息，后续可以加userAgent等
+// 获取连接客户端的信息，后续可以加userAgent等
 func (c *Connection) RemoteAddr() net.Addr {
 	return c.Conn.RemoteAddr()
 }
 
-//发送数据，将数据发送给远程客户端（无缓冲）
+// 发送数据，将数据发送给远程客户端（无缓冲）
 func (c *Connection) SendMsg(data string) error {
 	if c.isClosed {
 		return errors.New("connection sendmsg is closed1")
@@ -204,17 +194,17 @@ func (c *Connection) SendMsg(data string) error {
 	return nil
 }
 
-//发送数据，将数据发送给远程客户端（无缓冲）
+// 发送数据，将数据发送给远程客户端（无缓冲）
 func (c *Connection) SendByteMsg(data []byte) error {
 	return c.SendMsg(string(data))
 }
 
-//发送数据，将数据发送给远程客户端（有缓冲）
+// 发送数据，将数据发送给远程客户端（有缓冲）
 func (c *Connection) SendBuffByteMsg(data []byte) error {
 	return c.SendBuffMsg(string(data))
 }
 
-//发送数据，将数据发送给远程客户端（有缓冲）
+// 发送数据，将数据发送给远程客户端（有缓冲）
 func (c *Connection) SendBuffMsg(data string) error {
 	if c.isClosed {
 		return errors.New("connection SendBuffMsg is closed1")
@@ -225,14 +215,14 @@ func (c *Connection) SendBuffMsg(data string) error {
 	return nil
 }
 
-//设置连接属性
+// 设置连接属性
 func (c *Connection) SetProperty(key string, value interface{}) {
 	c.propertyLock.Lock()
 	defer c.propertyLock.Unlock()
 	c.property[key] = value
 }
 
-//获取连接属性
+// 获取连接属性
 func (c *Connection) GetProperty(key string) (interface{}, error) {
 	c.propertyLock.RLock()
 	defer c.propertyLock.RUnlock()
@@ -243,7 +233,7 @@ func (c *Connection) GetProperty(key string) (interface{}, error) {
 	}
 }
 
-//移除设置属性
+// 移除设置属性
 func (c *Connection) RemoveProperty(key string) {
 	c.propertyLock.Lock()
 	defer c.propertyLock.Unlock()
@@ -255,12 +245,12 @@ func (c *Connection) RemoveProperty(key string) {
 // 	c.messageType = mt
 // }
 
-//获取消息类型
+// 获取消息类型
 func (c *Connection) GetMessageType() int {
 	return c.messageType
 }
 
-//是否关闭
+// 是否关闭
 func (c *Connection) IsClosed() bool {
 	return c.isClosed
 }

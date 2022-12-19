@@ -11,12 +11,9 @@ type IConnection interface {
 	//关闭链接停止工作
 	Close()
 	//获取websocket链接
-	GetConnection() *websocket.Conn
+	GetWsConnection() *websocket.Conn
 	//获取当前连接ID
 	GetConnID() uint64
 	//获取远程客户端地址信息
 	RemoteAddr() net.Addr
 }
-
-// 定义一个统一处理链接业务的接口
-type HandFunc func(*websocket.Conn, []byte, int) error

@@ -6,6 +6,9 @@ import (
 	"time"
 )
 
+/*
+模拟客户端
+*/
 func main() {
 
 	fmt.Println("Client Test ... start")
@@ -19,7 +22,7 @@ func main() {
 	}
 
 	for {
-		_, err := conn.Write([]byte("hahaha"))
+		_, err := conn.Write([]byte("Zinx V0.3"))
 		if err != nil {
 			fmt.Println("write error err ", err)
 			return
