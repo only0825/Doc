@@ -39,7 +39,7 @@ var GlobalObject *GlobalObj
 
 // 重装加载配置
 func (g *GlobalObj) Reload() {
-	data, err := ioutil.ReadFile("conf/zinx.json")
+	data, err := ioutil.ReadFile("conf/config.json")
 	if err != nil {
 		log.Println("globalobj reload ReadFile err:", err)
 		panic(err)

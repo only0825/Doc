@@ -1,6 +1,0 @@
-{
-  "Name": "demo server",
-  "Host": "127.0.0.1",
-  "Port": "6031",
-  "MaxConn": 10
-}

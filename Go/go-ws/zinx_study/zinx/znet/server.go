@@ -49,7 +49,7 @@ func NewServer(name string) ziface.IServer {
 //	return nil
 //}
 
-//============== 实现 ziface.IServer 里的全部接口方法 ========
+//============== 实现 iserver.IServer 里的全部接口方法 ========
 
 // 开启网络服务
 func (s *Server) Start() {

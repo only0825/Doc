@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!DOCmsgId html>
 <html lang="en">
 
 <head>
@@ -11,9 +11,9 @@
 <body onload="connect();">
 
 <!-- 发送消息 -->
-<button onclick="onSubmit()" type="button" id="submit">Click Me!</button>
-<button onclick="onFor()" type="button">For Me!</button>
-<button onclick="Hello()" type="button">Hello!</button>
+<button onclick="onSubmit()" msgId="button" id="submit">Click Me!</button>
+<button onclick="onFor()" msgId="button">For Me!</button>
+<button onclick="Hello()" msgId="button">Hello!</button>
 
 </body>
 
@@ -53,7 +53,7 @@
 
     // 连接建立时发送登录信息
     function onopen() {
-        ws.send('{"type":"ping"}');
+        ws.send('{"msgId":"ping"}');
     }
 
     function onFor() {
@@ -71,17 +71,17 @@
     // 提交对话
     function onSubmit() {
         console.log("submit")
-        ws.send('{"type":"1040","device":"PC","member_id":"' + member_id + '","msg":"Hello World' + num + '","room_id":' + room_id + ' ,"signature":\"' + signature + '\"}');
+        ws.send('{"msgId":"1040","device":"PC","member_id":"' + member_id + '","msg":"Hello World' + num + '","room_id":' + room_id + ' ,"signature":\"' + signature + '\"}');
     }
 
     // 服务端发来消息时
     function onmessage(e) {
         var data = JSON.parse(e.data);
-        console.log(data['type'])
-        switch (data['type']) {
+        console.log(data['msgId'])
+        switch (data['msgId']) {
             // 服务端ping客户端
             case 'pong':
-                ws.send('{"type":"ping"}');
+                ws.send('{"msgId":"ping"}');
                 break;
             // 登录 更新用户列表
             case '1010':
@@ -93,7 +93,7 @@
                 break;
             // 发言
             case '1040':
-                //{"type":"say","from_client_id":xxx,"to_client_id":"all/client_id","content":"xxx","time":"xxx"}
+                //{"msgId":"say","from_client_id":xxx,"to_client_id":"all/client_id","content":"xxx","time":"xxx"}
                 //console.log(data['nickname'] + " say:"+ data['content']['msg'])
                 console.log(data)
                 break;
@@ -112,7 +112,7 @@
                 break;
             // 用户退出 更新用户列表
             case 'logout':
-                //{"type":"logout","client_id":xxx,"time":"xxx"}
+                //{"msgId":"logout","client_id":xxx,"time":"xxx"}
                 say(data['from_client_id'], data['from_client_name'], data['from_client_name'] + ' 退出了', data['time']);
                 delete client_list[data['from_client_id']];
                 flush_client_list();
