@@ -40,7 +40,7 @@ func ConfigLocalFilesystemLogger(logPath string, logFileName string, maxAge time
 	log.SetOutput(writer1)
 
 	if err != nil {
-		log.Errorf("config local file system logger error. %+v", errors.WithStack(err))
+		log.Errorf("config local file system zlog error. %+v", errors.WithStack(err))
 	}
 	lfHook := lfshook.NewHook(lfshook.WriterMap{
 		log.DebugLevel: writer,

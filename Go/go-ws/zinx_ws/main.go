@@ -15,11 +15,6 @@ var (
 	configFile string
 )
 
-func initCmd() {
-	flag.StringVar(&configFile, "config", "./config.json", "where load config json")
-	flag.Parse()
-}
-
 //	WebSocket服务端
 //
 // ping test 自定义路由
@@ -41,22 +36,24 @@ func (this *PingRouter) Handle(request iserver.IRequest) {
 	}
 }
 
-func main() {
-	initCmd()
+func init() {
+	flag.StringVar(&configFile, "config", "./config.json", "where load config json")
+	flag.Parse()
 
-	bindAddress := ""
 	if err := configs.LoadConfig(configFile); err != nil {
 		fmt.Println("Load config json error:", err)
+		return
 	}
-
 	//common.InitRedis()
-	server.GWServer = server.NewServer()
+}
 
+func main() {
 	//配置路由
+	server.GWServer = server.NewServer()
 	server.GWServer.AddRouter("ping", &PingRouter{})
 	server.GWServer.AddRouter("1040", &PingRouter{})
 
-	bindAddress = fmt.Sprintf("%s:%d", configs.GConf.Ip, configs.GConf.Port)
+	bindAddress := fmt.Sprintf("%s:%d", configs.GConf.Ip, configs.GConf.Port)
 	gin.SetMode(gin.ReleaseMode)
 	r := gin.Default()
 	r.GET("/score", server.WsHandler)

@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/gorilla/websocket"
-	"io/ioutil"
 	"log"
 	"net/http"
 	"time"
@@ -64,7 +63,7 @@ func socketHandler(w http.ResponseWriter, r *http.Request) {
 			break
 		}
 		defer res.Body.Close()
-		body, err := ioutil.ReadAll(res.Body)
+		body, err := os.ReadAll(res.Body)
 		if err != nil {
 			loger.Println("Read body failed:", err)
 			break

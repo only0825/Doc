@@ -2,13 +2,12 @@ package configs
 
 import (
 	"encoding/json"
-	"io/ioutil"
 )
 
 type Conf struct {
 	//websocket config
 	Name          string `json:"name"`
-	IpVersion            string `json:"ipVersion"`
+	IpVersion     string `json:"ipVersion"`
 	Ip            string `json:"ip"`
 	Port          int    `json:"port"`
 	HeartBeatTime int    `json:"heartBeatTime"`
@@ -29,7 +28,7 @@ type Conf struct {
 
 	WorkerPoolSize uint64 `json:"workerPoolSize"`
 	MaxWorkTaskLen uint32 `json:"maxWorkTaskLen"`
-	MaxConn int `json:"maxConn"`
+	MaxConn        int    `json:"maxConn"`
 
 	GetTeacherInfoUrl string `json:"getTeacherInfoUrl"`
 }
@@ -37,7 +36,7 @@ type Conf struct {
 var GConf *Conf
 
 func LoadConfig(filename string) error {
-	content, err := ioutil.ReadFile(filename)
+	content, err := os.ReadFile(filename)
 
 	if err != nil {
 		return err

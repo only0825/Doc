@@ -3,7 +3,6 @@ package utils
 import (
 	"encoding/json"
 	"go-ws/zinx_study/zinx/ziface"
-	"io/ioutil"
 )
 
 /*
@@ -28,7 +27,7 @@ var GlobalObject *GlobalObj
 
 // 读取用户的配置文件
 func (g *GlobalObj) Reload() {
-	data, err := ioutil.ReadFile("conf/config.json")
+	data, err := os.ReadFile("conf/config.json")
 	if err != nil {
 		panic(err)
 	}

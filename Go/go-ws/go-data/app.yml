@@ -1,0 +1,39 @@
+# app.yml
+app:
+
+mysql:
+  host: 127.0.0.1
+  username: root
+  password: password
+  port: 3306
+  db: hainiu
+  charset: utf8mb4
+redisCluster:
+  0: "127.0.0.1:7000"
+  1: "127.0.0.1:7001"
+  2: "127.0.0.1:7002"
+  3: "127.0.0.1:7003"
+  4: "127.0.0.1:7004"
+  5: "127.0.0.1:7005"
+
+apiF:
+  odds: "http://api.wuhaicj.com/api/liveScore/change" # 足球即时比分 变量
+  oddsChange: "http://api.wuhaicj.com/api/liveScore/change" # 足球即时比分 变量
+  score: "http://api.wuhaicj.com/api/liveScore/change" # 足球即时比分 变量
+  scoreChange: "http://api.wuhaicj.com/api/liveScore/change" # 足球即时比分 变量
+
+ApiB:
+  odds: "http://api.wuhaicj.com/api/liveScore/change" # 足球即时比分 变量
+  oddsChange: "http://api.wuhaicj.com/api/liveScore/change" # 足球即时比分 变量
+  score: "http://api.wuhaicj.com/api/liveScore/change" # 足球即时比分 变量
+  scoreChange: "http://api.wuhaicj.com/api/liveScore/change" # 足球即时比分 变量
+
+ticks:
+  - 100
+  - 200
+  - 300
+maps:
+  1: 一
+  2: 二
+  3: 三
+

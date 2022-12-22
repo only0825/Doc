@@ -2,7 +2,7 @@ package configs
 
 import (
 	"encoding/json"
-	"io/ioutil"
+	"os"
 )
 
 type Conf struct {
@@ -37,7 +37,7 @@ type Conf struct {
 var GConf *Conf
 
 func LoadConfig(filename string) error {
-	content, err := ioutil.ReadFile(filename)
+	content, err := os.ReadFile(filename)
 
 	if err != nil {
 		return err
