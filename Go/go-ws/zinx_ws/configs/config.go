@@ -1,54 +1,77 @@
 package configs
 
 import (
-	"encoding/json"
+	"github.com/spf13/viper"
 	"os"
 )
 
-type Conf struct {
-	//websocket config
-	Name          string `json:"name"`
-	Scheme        string `json:"scheme"`
-	Ip            string `json:"ip"`
-	Port          int    `json:"port"`
-	HeartBeatTime int    `json:"heartBeatTime"`
-	InChanSize    int    `json:"inChanSize"`
-	OutChanSize   int    `json:"outChanSize"`
-
-	//redis config
-	RedisAddr string `json:"redisAddr"`
-	RedisPort int    `json:"redisPort"`
-	RedisPw   string `json:"redisPw"`
-
-	//db config
-	DbAddr     string `json:"dbAddr"`
-	DbPort     int    `json:"dbPort"`
-	DbDatabase string `json:"dbDatabase"`
-	DbUserName string `json:"dbUserName"`
-	DbPw       string `json:"dbPw"`
-
-	WorkerPoolSize uint64 `json:"workerPoolSize"`
-	MaxWorkTaskLen uint32 `json:"maxWorkTaskLen"`
-	MaxConn        int    `json:"maxConn"`
-
-	GetTeacherInfoUrl string `json:"getTeacherInfoUrl"`
+type Mysql struct {
+	Host     string `yaml:"host"`
+	Username string `yaml:"username"`
+	Password string `yaml:"password"`
+	Port     int    `yaml:"port"`
+	Db       string `yaml:"db"`
+	Charset  string `yaml:"charset"`
 }
 
-var GConf *Conf
+type Redis struct {
+	Host     string `yaml:"host"`
+	Password string `yaml:"password"`
+	Port     int    `yaml:"port"`
+	Timeout  int    `yaml:"timeout"`
+	Select   int    `yaml:"select"`
+}
 
-func LoadConfig(filename string) error {
-	content, err := os.ReadFile(filename)
+type Server struct {
+	Name           string
+	Scheme         string
+	Ip             string
+	Port           int
+	HeartBeatTime  int
+	InChanSize     int
+	OutChanSize    int
+	WorkerPoolSize uint64
+	MaxWorkTaskLen int
+	MaxConn        int
+}
 
+type AppConfig struct {
+	Mysql        Mysql
+	Redis        Redis
+	RedisCluster map[int]string
+	Cache        string
+	Server       Server
+}
+
+var Conf *AppConfig
+
+func LoadConfig() error {
+	wd, err := os.Getwd() // 获取当前文件路径
 	if err != nil {
 		return err
 	}
 
-	conf := Conf{}
-	err = json.Unmarshal(content, &conf)
+	c := &AppConfig{}
+	v := viper.New()
+	v.SetConfigName("app") //这里就是上面我们配置的文件名称，不需要带后缀名
+	v.AddConfigPath(wd)    //文件所在的目录路径
+	v.SetConfigType("yml") //这里是文件格式类型
 
+	err = v.ReadInConfig()
 	if err != nil {
 		return err
 	}
-	GConf = &conf
+
+	configs := v.AllSettings()
+	for k, val := range configs {
+		v.SetDefault(k, val)
+	}
+
+	err = v.Unmarshal(c) //反序列化至结构体
+	if err != nil {
+		return err
+	}
+
+	Conf = c
 	return nil
 }

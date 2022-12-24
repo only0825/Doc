@@ -23,6 +23,7 @@ type Connection struct {
 	//该连接的处理方法router
 	outChan           chan *Message
 	closeChan         chan byte
+	allChan           chan []byte // 发送给所有的chan
 	rooms             map[string]bool
 	MsgHandle         iserver.IMsgHandle
 	lastHeartBeatTime time.Time
@@ -40,9 +41,10 @@ func NewConnection(server iserver.IServer, wsSocket *websocket.Conn, connId uint
 		Conn:      wsSocket,
 		connId:    connId,
 		MsgHandle: msgHandler,
-		//inChan:            	make(chan *Message, configs.GConf.InChanSize),
-		outChan:           make(chan *Message, configs.GConf.OutChanSize),
+		//inChan:            	make(chan *Message, configs.Conf.Server.InChanSize),
+		outChan:           make(chan *Message, configs.Conf.Server.OutChanSize),
 		closeChan:         make(chan byte),
+		allChan:           make(chan []byte, 1024),
 		lastHeartBeatTime: time.Now(),
 		rooms:             make(map[string]bool),
 	}
@@ -54,6 +56,7 @@ func NewConnection(server iserver.IServer, wsSocket *websocket.Conn, connId uint
 func (c *Connection) Start() {
 	go c.readLoop()
 	go c.writeLoop()
+	//go c.writeAllLoop()
 }
 
 // 关闭连接
@@ -136,7 +139,7 @@ func (c *Connection) readLoop() {
 				msg:  message,
 			}
 			c.KeepAlive()
-			if configs.GConf.WorkerPoolSize > 0 {
+			if configs.Conf.Server.WorkerPoolSize > 0 {
 
 				//已经启动工作池机制，将消息交给Worker处理
 				c.MsgHandle.SendMsgToTaskQueue(&req)
@@ -178,11 +181,39 @@ ERR:
 CLOSED:
 }
 
+func (c *Connection) writeAllLoop() {
+	for {
+		select {
+		case messageAll := <-c.allChan:
+			c.Server.GetConnMgr().PushAll(messageAll)
+			c.KeepAlive()
+		case <-c.closeChan:
+			goto CLOSED
+		}
+	}
+	c.Close()
+CLOSED:
+}
+
 // 发送消息
 func (c *Connection) SendMessage(msgType int, msgData []byte) (err error) {
 	message := NewMsg("outChan", msgType, msgData)
 	select {
 	case c.outChan <- message:
+	case <-c.closeChan:
+		err = errors.New("ERR_CONNECTION_LOSS")
+	default: // 写操作不会阻塞, 因为channel已经预留给websocket一定的缓冲空间
+		err = errors.New("ERR_SEND_MESSAGE_FULL")
+	}
+	return
+}
+
+// 发送消息
+func (c *Connection) SendMessageToAll(msgData []byte) (err error) {
+	msg := msgData
+	fmt.Println(111)
+	select {
+	case c.allChan <- msg:
 	case <-c.closeChan:
 		err = errors.New("ERR_CONNECTION_LOSS")
 	default: // 写操作不会阻塞, 因为channel已经预留给websocket一定的缓冲空间
@@ -209,7 +240,7 @@ func (c *Connection) heartBeatChecker() {
 		timer *time.Timer
 	)
 
-	timer = time.NewTimer(time.Duration(configs.GConf.HeartBeatTime) * time.Second)
+	timer = time.NewTimer(time.Duration(configs.Conf.Server.HeartBeatTime) * time.Second)
 
 	for {
 		select {
@@ -218,7 +249,7 @@ func (c *Connection) heartBeatChecker() {
 				c.Close()
 			}
 
-			timer.Reset(time.Duration(configs.GConf.HeartBeatTime) * time.Second)
+			timer.Reset(time.Duration(configs.Conf.Server.HeartBeatTime) * time.Second)
 		case <-c.closeChan:
 			timer.Stop()
 
@@ -234,7 +265,7 @@ func (c *Connection) IsAlive() bool {
 	)
 	c.mutex.Lock()
 	defer c.mutex.Unlock()
-	if c.isClosed || now.Sub(c.lastHeartBeatTime) > time.Duration(configs.GConf.HeartBeatTime)*time.Second {
+	if c.isClosed || now.Sub(c.lastHeartBeatTime) > time.Duration(configs.Conf.Server.HeartBeatTime)*time.Second {
 		return false
 	}
 	return true

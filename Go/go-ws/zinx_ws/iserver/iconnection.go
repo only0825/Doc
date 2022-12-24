@@ -18,6 +18,8 @@ type IConnection interface {
 	RemoteAddr() net.Addr
 	//发送数据
 	SendMessage(msgType int, msgData []byte) error
+	//发送数据给所有客户端
+	SendMessageToAll(msgData []byte) error
 	//设置链接属性
 	SetProperty(key string, value interface{})
 	//获取链接属性

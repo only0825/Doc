@@ -5,15 +5,6 @@ import (
 	"os"
 )
 
-//type Redis struct {
-//	Host      string `yaml:"host"`
-//	Password  string `yaml:"password"`
-//	Timeout   int    `yaml:"timeout"`
-//	MaxActive int    `yaml:"max_active"`
-//	MaxIdle   int    `yaml:"max_idle"`
-//	Db        int
-//}
-
 type Mysql struct {
 	Host     string `yaml:"host"`
 	Username string `yaml:"username"`
@@ -21,6 +12,14 @@ type Mysql struct {
 	Port     int    `yaml:"port"`
 	Db       string `yaml:"db"`
 	Charset  string `yaml:"charset"`
+}
+
+type Redis struct {
+	Host     string `yaml:"host"`
+	Password string `yaml:"password"`
+	Port     int    `yaml:"port"`
+	Timeout  int    `yaml:"timeout"`
+	Select   int    `yaml:"select"`
 }
 
 type ApiF struct {
@@ -39,9 +38,11 @@ type ApiB struct {
 
 type AppConfig struct {
 	Mysql        Mysql
+	Redis        Redis
 	RedisCluster map[int]string
 	ApiF         ApiF
 	ApiB         ApiB
+	Cache        string
 }
 
 var Conf *AppConfig

@@ -14,6 +14,7 @@
 <button onclick="onSubmit()" msgId="button" id="submit">Click Me!</button>
 <button onclick="onFor()" msgId="button">For Me!</button>
 <button onclick="Hello()" msgId="button">Hello!</button>
+<button onclick="Broadcast()" msgId="button">Broadcast!</button>
 
 </body>
 
@@ -65,9 +66,11 @@
     }
 
     function Hello() {
-        ws.send('{"test":"Hello"}');
+        ws.send('{"msgId":"ping","test":"Hello"}');
     }
-
+    function Broadcast() {
+        ws.send('{"msgId":"1111","test":"Broadcast"}');
+    }
     // 提交对话
     function onSubmit() {
         console.log("submit")

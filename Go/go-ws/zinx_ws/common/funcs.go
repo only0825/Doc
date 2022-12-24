@@ -3,6 +3,7 @@ package common
 import (
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 	"strings"
 )
@@ -27,7 +28,7 @@ func HttpGet(url string, params map[string]interface{}) (retData map[string]inte
 	}
 
 	defer resp.Body.Close()
-	body, err := os.ReadAll(resp.Body)
+	body, err := io.ReadAll(resp.Body)
 
 	if err != nil {
 		fmt.Println(err)
@@ -50,7 +51,7 @@ func HttpPost(url string, params string) (stringBody string) {
 	}
 
 	defer resp.Body.Close()
-	body, err := os.ReadAll(resp.Body)
+	body, err := io.ReadAll(resp.Body)
 
 	if err != nil {
 		fmt.Println(err)

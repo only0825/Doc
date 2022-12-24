@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"io"
+	"hub/server"
 	"log"
 	"net/http"
 	"os"
@@ -13,7 +13,7 @@ var logger *log.Logger
 
 func main() {
 	//后台启动处理器
-	go hub.run()
+	go server.Hubb.Run()
 	http.HandleFunc("/score", wsHandle) // 将chat请求交给wsHandle处理
 	http.ListenAndServe(":6031", nil)   // 开始监听
 }
@@ -30,71 +30,48 @@ func init() {
 
 func wsHandle(w http.ResponseWriter, r *http.Request) {
 	// 通过升级后的升级起的到链接
-	conn, err := up.Upgrade(w, r, nil)
+	conn, err := server.Up.Upgrade(w, r, nil)
 	if err != nil {
 		fmt.Println("获取链接失败：", err)
 		return
 	}
 	// 连接成功后注册用户
-	user := &User{
-		conn: conn,
-		msg:  make(chan []byte),
+	user := &server.User{
+		Conn: conn,
+		Msg:  make(chan []byte),
 	}
-	hub.register <- user
+	server.Hubb.Register <- user
 	defer func() {
-		hub.unregister <- user
+		server.Hubb.Unregister <- user
 	}()
 	// 得到连接后，就可以开始读写数据了
-	go read(user)
-	go oddsChange(user)
+	go read()
 	write(user)
 }
 
-func read(user *User) {
+func read() {
 	// 从连接中循环读取信息
 	for {
-		_, msg, err := user.conn.ReadMessage()
-		if err != nil {
-			fmt.Println("用户退出:", user.conn.RemoteAddr().String())
-			hub.unregister <- user
-			break
-		}
+		//_, msg, err := user.conn.ReadMessage()
+		//if err != nil {
+		//	fmt.Println("用户退出:", user.conn.RemoteAddr().String())
+		//	hub.unregister <- user
+		//	break
+		//}
+		msg := "hahaah"
 		// 将读取到的信息传入websocket处理器中的broadcast中，
-		hub.broadcast <- msg
+		server.Hubb.Broadcast <- []byte(msg)
+		fmt.Println(msg)
+		time.Sleep(time.Duration(5) * time.Second)
 	}
 }
 
-func write(user *User) {
-	for data := range user.msg {
-		err := user.conn.WriteMessage(1, data)
+func write(user *server.User) {
+	for data := range user.Msg {
+		err := user.Conn.WriteMessage(1, data)
 		if err != nil {
 			fmt.Println("写入错误")
 			break
 		}
-	}
-}
-
-func oddsChange(user *User) {
-	for {
-		time.Sleep(time.Duration(3) * time.Second)
-		res, err := http.Get("http://api.wuhaicj.com/api/live/live")
-		if err != nil {
-			logger.Println("URL Request failed:", err)
-			break
-		}
-		msg, err := io.ReadAll(res.Body)
-		if err != nil {
-			logger.Println("Read body failed:", err)
-			break
-		}
-		defer res.Body.Close()
-		// 将读取到的信息传入websocket处理器中的broadcast中，
-
-		err = user.conn.WriteMessage(1, msg)
-		if err != nil {
-			fmt.Println("写入错误", err)
-			break
-		}
-		//hub.broadcast <- msg
 	}
 }

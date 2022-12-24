@@ -1,6 +1,6 @@
 # app.yml
-app:
 
+# 本地
 mysql:
   host: 127.0.0.1
   username: root
@@ -8,6 +8,18 @@ mysql:
   port: 3306
   db: hainiu
   charset: utf8mb4
+
+#mysql:
+#  host: 127.0.0.1
+#  username: u_hainiu
+#  password: hainiu@2022
+#  port: 3306
+#  db: db_haibao
+#  charset: utf8
+
+# 选择用Redis单机还是集群 填入redis或redisCLuster
+cache: redisCluster
+
 redisCluster:
   0: "127.0.0.1:7000"
   1: "127.0.0.1:7001"
@@ -16,24 +28,26 @@ redisCluster:
   4: "127.0.0.1:7004"
   5: "127.0.0.1:7005"
 
+redis:
+  host: 127.0.0.1
+  password: ''
+  port: 6379
+  timeout: 3600
+  select: 0
+
 apiF:
+  odds: "http://interface.bet007.com/football/odds.aspx" # 主盘口即时赔率（全量）
+  oddsChange: "http://interface.bet007.com/football/oddsChange.aspx" # 主盘口即时赔率（30秒变量）
+  score: "http://interface.bet007.com/football/today.aspx" # 当天比赛的比分数据（全量）
+#  scoreChange: "http://interface.bet007.com/football/change.aspx" # 当天比赛的比分数据（20秒变量）
+  scoreChange: "http://api.wuhaicj.com/api/liveScore/change" # 主盘口即时赔率（30秒变量）
+
+
+apiB:
   odds: "http://api.wuhaicj.com/api/liveScore/change" # 足球即时比分 变量
   oddsChange: "http://api.wuhaicj.com/api/liveScore/change" # 足球即时比分 变量
   score: "http://api.wuhaicj.com/api/liveScore/change" # 足球即时比分 变量
   scoreChange: "http://api.wuhaicj.com/api/liveScore/change" # 足球即时比分 变量
 
-ApiB:
-  odds: "http://api.wuhaicj.com/api/liveScore/change" # 足球即时比分 变量
-  oddsChange: "http://api.wuhaicj.com/api/liveScore/change" # 足球即时比分 变量
-  score: "http://api.wuhaicj.com/api/liveScore/change" # 足球即时比分 变量
-  scoreChange: "http://api.wuhaicj.com/api/liveScore/change" # 足球即时比分 变量
 
-ticks:
-  - 100
-  - 200
-  - 300
-maps:
-  1: 一
-  2: 二
-  3: 三
 

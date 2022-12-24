@@ -15,9 +15,9 @@ type MsgHandle struct {
 func NewMsgHandle() *MsgHandle {
 	m := &MsgHandle{
 		Apis:           make(map[string]iserver.IRouter),
-		WorkerPoolSize: configs.GConf.WorkerPoolSize,
+		WorkerPoolSize: configs.Conf.Server.WorkerPoolSize,
 		//一个worker对应一个queue
-		TaskQueue: make([]chan iserver.IRequest, configs.GConf.WorkerPoolSize),
+		TaskQueue: make([]chan iserver.IRequest, configs.Conf.Server.WorkerPoolSize),
 	}
 	m.StartWorkerPool()
 	return m
@@ -78,7 +78,7 @@ func (mh *MsgHandle) StartWorkerPool() {
 	for i := 0; i < int(mh.WorkerPoolSize); i++ {
 		//一个worker被启动
 		//给当前worker对应的任务队列开辟空间
-		mh.TaskQueue[i] = make(chan iserver.IRequest, configs.GConf.MaxWorkTaskLen)
+		mh.TaskQueue[i] = make(chan iserver.IRequest, configs.Conf.Server.MaxWorkTaskLen)
 		//启动当前Worker，阻塞的等待对应的任务队列是否有消息传递进来
 		go mh.StartOneWorker(i, mh.TaskQueue[i])
 	}

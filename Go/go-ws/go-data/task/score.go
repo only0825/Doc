@@ -28,6 +28,8 @@ func (this ScoreBasketBall) Run() {
 
 // 足球比分 当天比赛的比分数据（20秒变量）
 func scoreChange(url string, scType string) {
+	var cache = model.Rdbc
+
 	// 一、请求第三方接口
 	res, err := http.Get(url)
 	if err != nil /**/ {
@@ -49,14 +51,14 @@ func scoreChange(url string, scType string) {
 	}
 
 	// 二、存Redis （给推送服务用）  一分钟内相同的数据不写入scoreChange中
-	zlog.Info.Println("，数据获取成功")
-	isHave, _ := model.Rdbc.Get(ctx, "scoreChangeTemp:"+scType).Result()
+	zlog.Info.Println("数据获取成功")
+	isHave, _ := cache.Get(ctx, "scoreChangeTemp:"+scType).Result()
 	if (isHave != "") && (isHave == common.Md5String(string(msg))) {
-		zlog.Info.Println("，重复数据")
+		zlog.Info.Println("重复数据")
 		return
 	}
 	// 开启Redis事务
-	pipe := model.Rdbc.TxPipeline()
+	pipe := cache.TxPipeline()
 	// 临时存放去重
 	pipe.Set(ctx, "scoreChangeTemp:"+scType, common.Md5String(string(msg)), time.Duration(60)*time.Second)
 	// 将获取到的数据存入到Redis队列

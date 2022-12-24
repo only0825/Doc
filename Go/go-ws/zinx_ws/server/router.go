@@ -11,3 +11,4 @@ type BaseRouter struct{}
 func (br *BaseRouter) PreHandle(req iserver.IRequest)  {}
 func (br *BaseRouter) Handle(req iserver.IRequest)     {}
 func (br *BaseRouter) PostHandle(req iserver.IRequest) {}
+func (br *BaseRouter) HandleAll(req iserver.IRequest)  {}

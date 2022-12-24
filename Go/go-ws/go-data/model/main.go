@@ -6,7 +6,5 @@ import (
 )
 
 var DB *gorm.DB
-
-// var Ctx = context.Background()
 var Rdbc *redis.ClusterClient
-var rdb *redis.Client
+var Rdb *redis.Client

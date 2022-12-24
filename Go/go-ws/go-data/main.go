@@ -4,32 +4,9 @@ import (
 	"github.com/robfig/cron/v3"
 	"go-data/common"
 	"go-data/configs"
-	"go-data/model"
 	"go-data/task"
 	"go-data/zlog"
 )
-
-func init() {
-	if err := configs.LoadConfig(); err != nil {
-		zlog.Error.Println("Load config json error:", err)
-		return
-	}
-
-	rdbc, err := common.InitRedisCluster()
-	if err != nil {
-		zlog.Error.Println("Redis初始化失败: ", err)
-		return
-	}
-
-	db, err := common.InitMysql()
-	if err != nil {
-		zlog.Error.Println("数据库初始化失败: ", err)
-		return
-	}
-
-	model.DB = db
-	model.Rdbc = rdbc
-}
 
 // 返回一个支持至 秒 级别的 cron
 func newWithSeconds() *cron.Cron {
@@ -39,7 +16,24 @@ func newWithSeconds() *cron.Cron {
 }
 
 func main() {
-	//go oddsChange()
+	if err := configs.LoadConfig(); err != nil {
+		zlog.Error.Println("Load config json error:", err)
+		return
+	}
+
+	cache := configs.Conf.Cache
+	err := common.InitCache(cache)
+	if err != nil {
+		zlog.Error.Println("Redis初始化错误:", err)
+		return
+	}
+
+	err = common.InitMysql()
+	if err != nil {
+		zlog.Error.Println("数据库初始化失败: ", err)
+		return
+	}
+
 	i := 0
 	c := newWithSeconds()
 	//AddFunc

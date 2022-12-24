@@ -1,4 +1,4 @@
-package logger
+package zlog
 
 import (
 	"io"
@@ -15,10 +15,11 @@ var (
 func init() {
 	//日志输出文件
 	path := "./log/"
-	err := os.MkdirAll(path, 0777)
+	err := os.MkdirAll(path, 0766)
 	if err != nil {
-		panic(err)
+		log.Fatalln("mkdir error:", err)
 	}
+
 	file, err := os.OpenFile(path+time.Now().Format("20060102")+".log", os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0766)
 	if err != nil {
 		log.Fatalln("Faild to open error zlog file:", err)
