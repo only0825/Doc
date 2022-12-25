@@ -121,22 +121,22 @@ func (s *Server) Serve(c *gin.Context) {
 	s.Start(c)
 	//TODO Server.Serve() 是否在启动服务的时候 还要处理其他的事情呢 可以在这里添加
 
-	go func() {
-		var ctx = context.Background()
-		for {
-			result, err := model.Rdbc.LPop(ctx, "scoreChange:Football").Result()
-			if err == nil {
-				map1 := make(map[string]interface{})
-				map2 := make(map[int]interface{})
-				json.Unmarshal([]byte(result), &map1)
-				map2[0] = "score"
-				map2[1] = map1["changeList"]
-				str, _ := json.Marshal(map2)
-				s.GetConnMgr().PushAll(str)
-			}
-			time.Sleep(time.Duration(10) * time.Second)
+	//go func() {
+	var ctx = context.Background()
+	for {
+		result, err := model.Rdbc.LPop(ctx, "scoreChange:Football").Result()
+		if err == nil {
+			map1 := make(map[string]interface{})
+			map2 := make(map[int]interface{})
+			json.Unmarshal([]byte(result), &map1)
+			map2[0] = "score"
+			map2[1] = map1["changeList"]
+			str, _ := json.Marshal(map2)
+			s.GetConnMgr().PushAll(str)
 		}
-	}()
+		time.Sleep(time.Duration(10) * time.Second)
+	}
+	//}()
 
 	//阻塞,否则主Go退出， listenner的go将会退出
 	select {}

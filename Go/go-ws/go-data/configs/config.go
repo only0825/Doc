@@ -47,7 +47,7 @@ type AppConfig struct {
 
 var Conf *AppConfig
 
-func LoadConfig() error {
+func LoadConfig(fileName string) error {
 	wd, err := os.Getwd() // 获取当前文件路径
 	if err != nil {
 		return err
@@ -55,9 +55,9 @@ func LoadConfig() error {
 
 	c := &AppConfig{}
 	v := viper.New()
-	v.SetConfigName("app") //这里就是上面我们配置的文件名称，不需要带后缀名
-	v.AddConfigPath(wd)    //文件所在的目录路径
-	v.SetConfigType("yml") //这里是文件格式类型
+	v.SetConfigName(fileName) //这里就是上面我们配置的文件名称，不需要带后缀名
+	v.AddConfigPath(wd)       //文件所在的目录路径
+	v.SetConfigType("yml")    //这里是文件格式类型
 
 	err = v.ReadInConfig()
 	if err != nil {

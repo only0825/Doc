@@ -21,10 +21,6 @@ type PingRouter struct {
 	server.BaseRouter
 }
 
-type ScoreRouter struct {
-	server.BaseRouter
-}
-
 // Ping Handle
 func (this *PingRouter) Handle(request iserver.IRequest) {
 	fmt.Println(request.GetMsgID())
@@ -34,43 +30,8 @@ func (this *PingRouter) Handle(request iserver.IRequest) {
 		if err != nil {
 			zlog.Error.Println("ping 回调失败", err)
 		}
-		//case "1040":
-		//	var ctx = context.Background()
-		//	result, err := model.Rdbc.LPop(ctx, "scoreChange:Football").Result()
-		//	if err != nil {
-		//		fmt.Printf(err.Error())
-		//	} else {
-		//		err := request.GetConnection().SendMessageToAll([]byte(result))
-		//		if err != nil {
-		//			zlog.Error.Println("ScoreChange 回调失败", err)
-		//		}
-		//	}
 	}
-
-	//go func() {
-	//	for {
-	//
-	//		time.Sleep(time.Duration(5) * time.Second)
-	//	}
-	//}()
 }
-
-//func (this *ScoreRouter) Handle(request iserver.IRequest) {
-//	go func() {
-//		var ctx = context.Background()
-//		for {
-//			result, err := model.Rdbc.LPop(ctx, "scoreChange:Football").Result()
-//			if err == nil {
-//				err := request.GetConnection().SendMessageToAll([]byte(result))
-//				if err != nil {
-//					zlog.Error.Println("ScoreChange 回调失败", err)
-//				}
-//			}
-//			//server.GWServer.GetConnMgr().PushAll([]byte("haha"))
-//			time.Sleep(time.Duration(5) * time.Second)
-//		}
-//	}()
-//}
 
 func main() {
 
@@ -90,8 +51,6 @@ func main() {
 	//配置路由
 	server.GWServer = server.NewServer()
 	server.GWServer.AddRouter("ping", &PingRouter{})
-	server.GWServer.AddRouter("1040", &PingRouter{})
-	server.GWServer.AddRouter("1111", &ScoreRouter{})
 
 	bindAddress := fmt.Sprintf("%s:%d", configs.Conf.Server.Ip, configs.Conf.Server.Port)
 	gin.SetMode(gin.ReleaseMode)
