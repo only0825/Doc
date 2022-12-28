@@ -1,10 +1,8 @@
 package server
 
 import (
-	"context"
-	"encoding/json"
-	"fmt"
 	"github.com/gin-gonic/gin"
+	"github.com/go-redis/redis/v9"
 	"github.com/gorilla/websocket"
 	"log"
 	"net/http"
@@ -12,7 +10,8 @@ import (
 	"time"
 	"zinx_ws/configs"
 	"zinx_ws/iserver"
-	"zinx_ws/model"
+	"zinx_ws/task"
+	"zinx_ws/zlog"
 )
 
 // 服务器实现 ws://127.0.0.1:8080/echo
@@ -61,7 +60,7 @@ var cid uint32
 
 // 启动
 func (s *Server) Start(c *gin.Context) {
-	fmt.Printf("[START] Server name: %s,listenner at IP: %s, Port %d is starting\n", s.Name, s.IP, s.Port)
+	zlog.Info.Printf("[START] Server name: %s,listenner at IP: %s, Port %d is starting\n", s.Name, s.IP, s.Port)
 
 	//开启一个go去做服务端Linster业务
 	go func() {
@@ -82,7 +81,7 @@ func (s *Server) Start(c *gin.Context) {
 		if wsSocket, err = wsUpgrader.Upgrade(c.Writer, c.Request, nil); err != nil {
 			return
 		}
-		fmt.Println("Get conn remote addr = ", wsSocket.RemoteAddr().String())
+		zlog.Info.Println("Get conn remote addr = ", wsSocket.RemoteAddr().String())
 		//3 启动server网络连接业务
 
 		//3.2 设置服务器最大连接控制,如果超过最大连接，那么则关闭此新的连接
@@ -95,7 +94,7 @@ func (s *Server) Start(c *gin.Context) {
 		//3.3 处理该新连接请求的 业务 方法， 此时应该有 handler 和 conn是绑定的
 		dealConn := NewConnection(s, wsSocket, connId, s.MsgHandler)
 
-		fmt.Println("Current connId:", connId)
+		zlog.Info.Println("Current connId:", connId)
 		//3.4 启动当前链接的处理业务
 		go dealConn.Start()
 
@@ -121,22 +120,17 @@ func (s *Server) Serve(c *gin.Context) {
 	s.Start(c)
 	//TODO Server.Serve() 是否在启动服务的时候 还要处理其他的事情呢 可以在这里添加
 
-	//go func() {
-	var ctx = context.Background()
 	for {
-		result, err := model.Rdbc.LPop(ctx, "scoreChange:Football").Result()
-		if err == nil {
-			map1 := make(map[string]interface{})
-			map2 := make(map[int]interface{})
-			json.Unmarshal([]byte(result), &map1)
-			map2[0] = "score"
-			map2[1] = map1["changeList"]
-			str, _ := json.Marshal(map2)
-			s.GetConnMgr().PushAll(str)
+		scoreData, err := task.Score()
+		if err == redis.Nil {
+			continue
 		}
-		time.Sleep(time.Duration(10) * time.Second)
+		if err != nil {
+			zlog.Error.Println("推送失败", err)
+			continue
+		}
+		s.GetConnMgr().PushAll(scoreData)
 	}
-	//}()
 
 	//阻塞,否则主Go退出， listenner的go将会退出
 	select {}

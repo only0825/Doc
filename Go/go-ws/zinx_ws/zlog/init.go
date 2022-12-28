@@ -10,14 +10,18 @@ import (
 var (
 	Info  *log.Logger
 	Error *log.Logger
+	err   error
 )
 
 func init() {
 	//日志输出文件
 	path := "./log/"
-	err := os.MkdirAll(path, 0766)
+	_, err = os.Stat(path) // err为nil说明目录存在
 	if err != nil {
-		log.Fatalln("mkdir error:", err)
+		err = os.MkdirAll(path, 0777)
+		if err != nil {
+			panic(err)
+		}
 	}
 
 	file, err := os.OpenFile(path+time.Now().Format("20060102")+".log", os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0766)

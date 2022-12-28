@@ -17,7 +17,7 @@ func newWithSeconds() *cron.Cron {
 }
 
 func main() {
-
+	var err error
 	// 获取命令行参数
 	argc := len(os.Args)
 	if argc != 2 {
@@ -25,13 +25,13 @@ func main() {
 		return
 	}
 
-	if err := configs.LoadConfig(os.Args[1]); err != nil {
+	if err = configs.LoadConfig(os.Args[1]); err != nil {
 		zlog.Error.Println("Load config json error:", err)
 		return
 	}
 
 	cache := configs.Conf.Cache
-	err := common.InitCache(cache)
+	err = common.InitCache(cache)
 	if err != nil {
 		zlog.Error.Println("Redis初始化错误:", err)
 		return
@@ -45,19 +45,18 @@ func main() {
 
 	c := newWithSeconds()
 
-	//spec1 := "*/5 * * * * ?" // 每隔5秒执行一次
+	spec1 := "*/3 * * * * ?" // 每隔5秒执行一次
 	spec2 := "0 */1 * * * ?" // 每隔1分钟执行一次
 	//spec2 := "*/1 * * * * ?" //
 
 	// 足球比分变量
-	//c.AddJob(spec1, task.ScoreFootball{})
+	c.AddJob(spec1, task.ScoreFootball{})
+
+	// 足球指数变量
+	c.AddJob(spec1, task.OddsChangeFootball{})
 
 	// 足球 主盘口即时赔率（全量）
 	c.AddJob(spec2, task.OddsFootball{})
-
-	//c.AddJob(spec, task.OddsFootball{})  // 足球指数
-
-	//c.AddJob(spec, model.TaskScoreBasketBall{})
 
 	//启动计划任务
 	c.Start()

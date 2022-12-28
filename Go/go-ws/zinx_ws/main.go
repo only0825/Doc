@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"os"
 	"zinx_ws/common"
 	"zinx_ws/configs"
 	"zinx_ws/iserver"
@@ -35,11 +36,20 @@ func (this *PingRouter) Handle(request iserver.IRequest) {
 
 func main() {
 
-	if err := configs.LoadConfig(); err != nil {
-		fmt.Println(err)
+	// 获取命令行参数
+	argc := len(os.Args)
+	if argc != 2 {
+		zlog.Error.Println("运行格式错误，格式为 ./应用 <配置文件名称>")
+		return
+	}
+
+	if err := configs.LoadConfig(os.Args[1]); err != nil {
 		zlog.Error.Println("Load config json error:", err)
 		return
 	}
+
+	msg := fmt.Sprintf("服务监听 %s:%d", configs.Conf.Server.Ip, configs.Conf.Server.Port)
+	zlog.Info.Printf(msg)
 
 	cache := configs.Conf.Cache
 	err := common.InitCache(cache)
@@ -55,9 +65,11 @@ func main() {
 	bindAddress := fmt.Sprintf("%s:%d", configs.Conf.Server.Ip, configs.Conf.Server.Port)
 	gin.SetMode(gin.ReleaseMode)
 	r := gin.Default()
-	r.GET("/score", server.WsHandler)
-	r.Run(bindAddress)
-
+	r.GET("/change", server.WsHandler)
+	err = r.Run(bindAddress)
+	if err != nil {
+		zlog.Error.Println("启动服务失败:", err)
+	}
 	//server.GWServer.GetConnMgr().
 
 }

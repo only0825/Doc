@@ -32,9 +32,7 @@ apiF:
   odds: "http://interface.bet007.com/football/odds.aspx" # 主盘口即时赔率（全量）
   oddsChange: "http://interface.bet007.com/football/oddsChange.aspx" # 主盘口即时赔率（30秒变量）
   score: "http://interface.bet007.com/football/today.aspx" # 当天比赛的比分数据（全量）
-#  scoreChange: "http://interface.bet007.com/football/change.aspx" # 当天比赛的比分数据（20秒变量）
-  scoreChange: "http://api.wuhaicj.com/api/liveScore/change" # 主盘口即时赔率（30秒变量）
-
+  scoreChange: "http://interface.bet007.com/football/change.aspx" # 当天比赛的比分数据（20秒变量）
 
 apiB:
   odds: "http://api.wuhaicj.com/api/liveScore/change" # 足球即时比分 变量
