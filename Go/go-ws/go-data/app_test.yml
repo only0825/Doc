@@ -1,24 +1,17 @@
 # app_test.yml
 
-# 本地
+
+# 测试环境
 mysql:
   host: 127.0.0.1
-  username: root
-  password: password
+  username: u_hainiu
+  password: hainiu@2022
   port: 3306
-  db: hainiu
-  charset: utf8mb4
-
-#mysql:
-#  host: 127.0.0.1
-#  username: u_hainiu
-#  password: hainiu@2022
-#  port: 3306
-#  db: db_haibao
-#  charset: utf8
+  db: db_haibao
+  charset: utf8
 
 # 选择用Redis单机还是集群 填入redis或redisCLuster
-cache: redisCluster
+cache: redis
 
 redisCluster:
   0: "127.0.0.1:7000"

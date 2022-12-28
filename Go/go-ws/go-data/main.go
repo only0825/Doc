@@ -46,8 +46,8 @@ func main() {
 	c := newWithSeconds()
 
 	//spec1 := "*/5 * * * * ?" // 每隔5秒执行一次
-	//spec2 := "0 */1 * * * ?" // 每隔1分钟执行一次
-	spec2 := "*/1 * * * * ?" //
+	spec2 := "0 */1 * * * ?" // 每隔1分钟执行一次
+	//spec2 := "*/1 * * * * ?" //
 
 	// 足球比分变量
 	//c.AddJob(spec1, task.ScoreFootball{})
