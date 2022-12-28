@@ -31,7 +31,7 @@ redis:
 server:
   name: "ws server"
   scheme: "ws"
-  ip: "127.0.0.1"
+  ip: "172.27.87.36"
   Port: 6039
   heartBeatTime: 60
   inChanSize: 1024

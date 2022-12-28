@@ -120,17 +120,32 @@ func (s *Server) Serve(c *gin.Context) {
 	s.Start(c)
 	//TODO Server.Serve() 是否在启动服务的时候 还要处理其他的事情呢 可以在这里添加
 
-	for {
-		scoreData, err := task.Score()
-		if err == redis.Nil {
-			continue
+	go func() {
+		for {
+			scoreData, err := task.Score()
+			if err == redis.Nil {
+				return
+			}
+			if err != nil {
+				zlog.Error.Println("比分数据 推送失败", err)
+				return
+			}
+			s.GetConnMgr().PushAll(scoreData)
 		}
-		if err != nil {
-			zlog.Error.Println("推送失败", err)
-			continue
+	}()
+	go func() {
+		for {
+			oddsData, err := task.Odds()
+			if err == redis.Nil {
+				return
+			}
+			if err != nil {
+				zlog.Error.Println("指数数据 推送失败", err)
+				return
+			}
+			s.GetConnMgr().PushAll(oddsData)
 		}
-		s.GetConnMgr().PushAll(scoreData)
-	}
+	}()
 
 	//阻塞,否则主Go退出， listenner的go将会退出
 	select {}

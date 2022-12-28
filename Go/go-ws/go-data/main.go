@@ -50,7 +50,7 @@ func main() {
 	//spec2 := "*/1 * * * * ?" //
 
 	// 足球比分变量
-	c.AddJob(spec1, task.ScoreFootball{})
+	c.AddJob(spec1, task.ScoreChangeFootball{})
 
 	// 足球指数变量
 	c.AddJob(spec1, task.OddsChangeFootball{})

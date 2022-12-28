@@ -38,7 +38,8 @@
     // 连接服务端
     function connect() {
         // 创建websocket
-        ws = new WebSocket("ws://127.0.0.1:6039/change");
+        // ws = new WebSocket("ws://47.243.109.82:6039/change"); // 测试环境
+         ws = new WebSocket("ws://127.0.0.1:6039/change"); // 本地环境
         // 当socket连接打开时，输入用户名
         ws.onopen = onopen;
         // 当有消息时根据消息类型显示不同信息
