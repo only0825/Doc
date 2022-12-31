@@ -7,7 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>websocket demo</title>
 </head>
-
+<!--<script type="text/javascript" src="crypt.js"></script>-->
 <body onload="connect();">
 
 <!-- 发送消息 -->
@@ -15,13 +15,13 @@
 <button onclick="onFor()" msgId="button">For Me!</button>
 <button onclick="Hello()" msgId="button">Hello!</button>
 <button onclick="Broadcast()" msgId="button">Broadcast!</button>
+<script src="https://cdn.bootcss.com/crypto-js/3.1.9-1/crypto-js.min.js"></script>
 
 </body>
 
 <script>
 
     let num = 1;
-
     var ws, client_list = {}, room_id, client_id;
     let member_id = 1000006;
     let signature = "8bfd39783050fbc04cab793e6ca20d17";
@@ -38,8 +38,9 @@
     // 连接服务端
     function connect() {
         // 创建websocket
-        // ws = new WebSocket("ws://47.243.109.82:6039/change"); // 测试环境
-         ws = new WebSocket("ws://127.0.0.1:6039/change"); // 本地环境
+        ws = new WebSocket("ws://47.243.109.82:6039/change"); // 测试环境
+        //  ws = new WebSocket("ws://127.0.0.1:6039/change?token=d5mR1PmrdFBOy9bkga82ViWDwCA%3D&EIO=3"); // 本地环境
+        // ws = new WebSocket("ws://127.0.0.1:6039/change); // 本地环境
         // 当socket连接打开时，输入用户名
         ws.onopen = onopen;
         // 当有消息时根据消息类型显示不同信息
@@ -67,11 +68,13 @@
     }
 
     function Hello() {
-        ws.send('{"msgId":"ping","test":"Hello"}');
+        ws.send('{"msgId":"ping","crypt":"Hello"}');
     }
+
     function Broadcast() {
-        ws.send('{"msgId":"1111","test":"Broadcast"}');
+        ws.send('{"msgId":"1111","crypt":"Broadcast"}');
     }
+
     // 提交对话
     function onSubmit() {
         console.log("submit")
@@ -124,8 +127,19 @@
         }
     }
 
-    // "海牛会员2"
-
+    function encrypt(plainText, key) {
+        const iv = CryptoJS.randomBytes(key)
+        const cipher = CryptoJS.createCipheriv("aes-256-cbc", key, 1123);
+        let cipherText;
+        try {
+            cipherText = cipher.update(plainText, 'utf8', 'hex');
+            cipherText += cipher.final('hex');
+            cipherText = iv.toString('hex') + cipherText
+        } catch (e) {
+            cipherText = null;
+        }
+        return cipherText;
+    }
 
 </script>
 

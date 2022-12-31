@@ -4,10 +4,10 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"os"
-	"zinx_ws/common"
 	"zinx_ws/configs"
 	"zinx_ws/iserver"
 	"zinx_ws/server"
+	"zinx_ws/utils"
 	"zinx_ws/zlog"
 )
 
@@ -52,7 +52,7 @@ func main() {
 	zlog.Info.Printf(msg)
 
 	cache := configs.Conf.Cache
-	err := common.InitCache(cache)
+	err := utils.InitCache(cache)
 	if err != nil {
 		zlog.Error.Println("Redis初始化错误:", err)
 		return

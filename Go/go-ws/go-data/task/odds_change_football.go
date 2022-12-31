@@ -2,13 +2,12 @@ package task
 
 import (
 	"encoding/json"
-	"fmt"
-	"github.com/valyala/fasthttp"
 	"go-data/common"
 	"go-data/configs"
 	"go-data/model"
 	"go-data/zlog"
-	"os"
+	"io"
+	"net/http"
 	"time"
 )
 
@@ -22,28 +21,29 @@ func (this OddsChangeFootball) Run() {
 }
 
 func oddsChange(url string, odType string) {
-	var cache = model.Rdbc
+	var cache = model.Rdb
 
-	status, resp, err := fasthttp.Get(nil, url)
+	resp, err := http.Get(url)
 	if err != nil {
 		zlog.Error.Println("请求失败:", err.Error())
 		return
 	}
 
-	if status != fasthttp.StatusOK {
-		zlog.Error.Println("请求没有成功:", status)
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		zlog.Error.Println("io.ReadAll失败:", err.Error())
 		return
 	}
 
 	// 判断获取到的数据是否为空
-	if len(resp) < 50 {
+	if len(body) < 50 {
 		zlog.Info.Println("changeList value empty")
 		return
 	}
 
 	var obj OddsChange
-	if err = json.Unmarshal(resp, &obj); err != nil {
-		zlog.Error.Println("json反序列化失败: ", err)
+	if err = json.Unmarshal(body, &obj); err != nil {
+		zlog.Error.Println("json 反序列化失败: ", err)
 		return
 	}
 
@@ -91,12 +91,10 @@ func oddsChange(url string, odType string) {
 
 	saveByte, err := json.Marshal(rc)
 	if err != nil {
-		zlog.Error.Println("json 编译错误:", err)
+		zlog.Error.Println("json 序列化错误:", err)
 		return
 	}
 
-	fmt.Println(string(saveByte))
-	os.Exit(1)
 	// 二、存Redis （给推送服务用）  一分钟内相同的数据不写入oddsChange中
 	isHave, _ := cache.Get(ctx, "oddsChangeTemp:"+odType).Result()
 	if (isHave != "") && (isHave == common.Md5String(string(saveByte))) {

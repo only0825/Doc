@@ -38,3 +38,6 @@ server:
   workerPoolSize: 4
   maxWorkTaskLen: 10
   maxConn: 1000
+
+# 用于WS连接鉴权的key和内容
+wsKey: "d0caea82c21bb744d54cc84bc4d0a430"

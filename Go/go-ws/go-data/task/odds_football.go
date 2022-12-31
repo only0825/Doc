@@ -2,10 +2,11 @@ package task
 
 import (
 	"encoding/json"
-	"github.com/valyala/fasthttp"
 	"go-data/configs"
 	"go-data/model"
 	"go-data/zlog"
+	"io"
+	"net/http"
 )
 
 // 足球指数 全量
@@ -19,26 +20,26 @@ func (this OddsFootball) Run() {
 
 // 足球指数全量，只存数据库
 func odds(url string) {
-
-	status, resp, err := fasthttp.Get(nil, url)
+	resp, err := http.Get(url)
 	if err != nil {
 		zlog.Error.Println("请求失败:", err.Error())
 		return
 	}
 
-	if status != fasthttp.StatusOK {
-		zlog.Error.Println("请求没有成功:", status)
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		zlog.Error.Println("io.ReadAll失败:", err.Error())
 		return
 	}
 
 	// 判断获取到的数据是否为空
-	if len(resp) < 50 {
+	if len(body) < 50 {
 		zlog.Info.Println("list value empty")
 		return
 	}
 
 	var obj Odds
-	if err = json.Unmarshal(resp, &obj); err != nil {
+	if err = json.Unmarshal(body, &obj); err != nil {
 		zlog.Error.Println("json反序列化失败: ", err)
 		return
 	}

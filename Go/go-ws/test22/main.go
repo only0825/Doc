@@ -1,84 +1,108 @@
 package main
 
 import (
+	"crypto/aes"
+	"crypto/cipher"
+	"crypto/rand"
+	"encoding/hex"
+	"errors"
 	"fmt"
+	"io"
 	"strconv"
 	"time"
 )
 
-type bar struct {
-	timestamp time.Time
-	open      float64
-	high      float64
-	low       float64
-	close     float64
-	volume    float64
-	cVolume   float64
-}
-
-func newBar(s []string) *bar {
-	b := &bar{}
-
-	if len(s) > 0 {
-		b.timestamp, _ = time.Parse(time.RFC3339, s[0])
-		fmt.Println(b.timestamp)
-	}
-
-	if len(s) > 1 {
-		b.open, _ = strconv.ParseFloat(s[1], 64)
-	}
-
-	if len(s) > 2 {
-		b.high, _ = strconv.ParseFloat(s[2], 64)
-	}
-
-	if len(s) > 3 {
-		b.low, _ = strconv.ParseFloat(s[3], 64)
-	}
-
-	if len(s) > 4 {
-		b.close, _ = strconv.ParseFloat(s[4], 64)
-	}
-
-	if len(s) > 5 {
-		b.volume, _ = strconv.ParseFloat(s[5], 64)
-	}
-
-	if len(s) > 6 {
-		b.cVolume, _ = strconv.ParseFloat(s[6], 64)
-	}
-
-	return b
-}
+// Cipher key must be 32 chars long because block size is 16 bytes
+const CIPHER_KEY = "d0caea82c21bb744d54cc84bc4d0a430"
 
 func main() {
-	s := [][]string{
-		{
-			"2019-03-20T16:00:00.000Z",
-			"3.721",
-			"3.743",
-			"3.677",
-			"3.708",
-			"8422410",
-			"22698348.04828491",
-		},
-		{
-			"2019-03-19T16:00:00.000Z",
-			"3.731",
-			"3.799",
-			"3.494",
-			"3.72",
-			"24912403",
-			"67632347.24399722",
-		},
+	decrypt, err := CBCDecrypt("cf4881d129575ef63b6b273bcd98988aaaee28b0d0cdb1188bf25c60f66fe5a6")
+	if err != nil {
+		fmt.Println(err)
 	}
 
-	var bs []*bar
-	for _, data := range s {
-		fmt.Println(data)
-		bs = append(bs, newBar(data))
+	i, err := strconv.ParseInt(decrypt, 10, 64)
+	fmt.Println(len(decrypt))
+	//i, err := strconv.Atoi(decrypt)
+	datetime := time.Unix(int64(i)/1000, 0).Format("2006-01-02 15:04:05")
+
+	fmt.Println(datetime)
+}
+
+// Encrypt encrypts plain text string into cipher text string
+func CBCEncrypt(unencrypted string) (string, error) {
+	key := []byte(CIPHER_KEY)
+	plainText := []byte(unencrypted)
+	plainText, err := Pad(plainText, aes.BlockSize)
+	if err != nil {
+		return "", fmt.Errorf(`plainText: "%s" has error`, plainText)
+	}
+	if len(plainText)%aes.BlockSize != 0 {
+		err := fmt.Errorf(`plainText: "%s" has the wrong block size`, plainText)
+		return "", err
 	}
 
-	fmt.Println(bs[0].high)
-	fmt.Printf("%v\n", bs)
+	block, err := aes.NewCipher(key)
+	if err != nil {
+		return "", err
+	}
+
+	cipherText := make([]byte, aes.BlockSize+len(plainText))
+	iv := cipherText[:aes.BlockSize]
+	if _, err := io.ReadFull(rand.Reader, iv); err != nil {
+		return "", err
+	}
+
+	mode := cipher.NewCBCEncrypter(block, iv)
+	mode.CryptBlocks(cipherText[aes.BlockSize:], plainText)
+
+	return fmt.Sprintf("%x", cipherText), nil
+}
+
+// Decrypt decrypts cipher text string into plain text string
+func CBCDecrypt(encrypted string) (string, error) {
+	key := []byte(CIPHER_KEY)
+	cipherText, _ := hex.DecodeString(encrypted)
+
+	block, err := aes.NewCipher(key)
+	if err != nil {
+		panic(err)
+	}
+
+	if len(cipherText) < aes.BlockSize {
+		panic("cipherText too short")
+	}
+	iv := cipherText[:aes.BlockSize]
+	cipherText = cipherText[aes.BlockSize:]
+	if len(cipherText)%aes.BlockSize != 0 {
+		panic("cipherText is not a multiple of the block size")
+	}
+
+	mode := cipher.NewCBCDecrypter(block, iv)
+	mode.CryptBlocks(cipherText, cipherText)
+
+	cipherText, _ = Unpad(cipherText, aes.BlockSize)
+	return fmt.Sprintf("%s", cipherText), nil
+}
+
+func Pad(buf []byte, size int) ([]byte, error) {
+	bufLen := len(buf)
+	padLen := size - bufLen%size
+	padded := make([]byte, bufLen+padLen)
+	copy(padded, buf)
+	for i := 0; i < padLen; i++ {
+		padded[bufLen+i] = byte(padLen)
+	}
+	return padded, nil
+}
+
+func Unpad(padded []byte, size int) ([]byte, error) {
+	if len(padded)%size != 0 {
+		return nil, errors.New("pkcs7: Padded value wasn't in correct size.")
+	}
+
+	bufLen := len(padded) - int(padded[len(padded)-1])
+	buf := make([]byte, bufLen)
+	copy(buf, padded[:bufLen])
+	return buf, nil
 }

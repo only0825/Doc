@@ -1,0 +1,6 @@
+[submodule "contrib"]
+	path = contrib
+	url = git@github.com:GoMyself/contrib.git
+[submodule "message"]
+	path = message
+	url = git@github.com:vnsubs/message.git

@@ -1,4 +1,4 @@
-package common
+package utils
 
 import (
 	"context"
@@ -51,20 +51,4 @@ func initRedis() error {
 	}
 	model.Rdb = rdb
 	return nil
-}
-
-type Cache struct {
-	redis        redis.Client
-	redisCluster redis.ClusterClient
-}
-
-func GetRedisInstance() interface{} {
-	cacheType := configs.Conf.Cache
-	if cacheType == "redisCluster" {
-		return model.Rdbc
-	} else if cacheType == "redis" {
-		return model.Rdb
-	} else {
-		return nil
-	}
 }

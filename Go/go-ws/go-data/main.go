@@ -67,6 +67,6 @@ func main() {
 	select {}
 
 	// 实时比分
-	//go model.ScoreChange("http://api.wuhaicj.com/api/liveScore/change2", common.BasketBall)
-	//model.ScoreChange("http://api.wuhaicj.com/api/liveScore/change", common.Football)
+	//go model.ScoreChange("http://api.wuhaicj.com/api/liveScore/change2", utils.BasketBall)
+	//model.ScoreChange("http://api.wuhaicj.com/api/liveScore/change", utils.Football)
 }

@@ -79,9 +79,21 @@ func (s *Server) Start(c *gin.Context) {
 		)
 
 		if wsSocket, err = wsUpgrader.Upgrade(c.Writer, c.Request, nil); err != nil {
+			zlog.Info.Println("wsUpgrader.Upgrade wrong", err)
 			return
 		}
+
 		zlog.Info.Println("Get conn remote addr = ", wsSocket.RemoteAddr().String())
+
+		//// WS token 鉴权
+		//token := c.Query("token")
+		//if token == "" {
+		//	return
+		//}
+		//// 解码出时间，如果时间超过2分钟，则不通过
+		//fmt.Println(token)
+		//decrypt, err := utils.CBCDecrypt(token, configs.Conf.WsKey)
+
 		//3 启动server网络连接业务
 
 		//3.2 设置服务器最大连接控制,如果超过最大连接，那么则关闭此新的连接

@@ -1,4 +1,4 @@
-var CryptoJS = require("crypto-js");
+const CryptoJS = require("crypto-js");
 
 // 辅助函数
 function md5(data) {

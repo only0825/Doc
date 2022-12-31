@@ -41,6 +41,7 @@ type AppConfig struct {
 	RedisCluster map[int]string
 	Cache        string
 	Server       Server
+	WsKey        string
 }
 
 var Conf *AppConfig

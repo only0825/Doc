@@ -36,14 +36,14 @@ type EuropeOddsChange struct {
 
 // 大小球数据 变量
 type OverUnderChange struct {
-	MatchId       int     // 比赛ID
-	CompanyId     int     // 公司ID
-	HandicapOdds  float64 // 即时盘盘口赔率
-	BigBallOdds   float64 // 即时盘大球赔率
-	SmallBallOdds float64 // 即时盘小球赔率
-	ChangeTime    string  // 变盘时间
-	IsClose       bool    // 是否封盘 临时性封盘或停止走地。
-	OddsType      int     // 0无类型数据 1早餐盘 2赛前即时盘 3走地盘
+	MatchId       int     `json:"match_id"`        // 比赛ID
+	CompanyId     int     `json:"company_id"`      // 公司ID
+	HandicapOdds  float64 `json:"handicap_odds"`   // 即时盘盘口赔率
+	BigBallOdds   float64 `json:"big_ball_odds"`   // 即时盘大球赔率
+	SmallBallOdds float64 `json:"small_ball_odds"` // 即时盘小球赔率
+	ChangeTime    string  `json:"change_time"`     // 变盘时间
+	IsClose       bool    `json:"is_close"`        // 是否封盘 临时性封盘或停止走地。
+	OddsType      int     `json:"odds_type"`       // 0无类型数据 1早餐盘 2赛前即时盘 3走地盘
 }
 
 type respOddsChange struct {

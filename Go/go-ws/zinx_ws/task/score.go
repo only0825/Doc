@@ -8,7 +8,7 @@ import (
 
 // 足球比分
 func Score() ([]byte, error) {
-	cache := model.Rdbc
+	cache := model.Rdb
 	// 用阻塞方式弹出数据
 	result, err := cache.BLPop(ctx, time.Duration(20)*time.Second, "scoreChange:Football").Result()
 	if err != nil {
