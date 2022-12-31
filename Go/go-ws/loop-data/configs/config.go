@@ -34,6 +34,7 @@ type ApiB struct {
 	OddsChange  string `yaml:"oddsChange"`
 	Score       string `yaml:"score"`
 	ScoreChange string `yaml:"scoreChange"`
+	Stats       string `yaml:"  stats"`
 }
 
 type AppConfig struct {

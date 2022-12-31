@@ -51,8 +51,9 @@ func main() {
 	}
 
 	c := newWithSeconds()
-	spec1 := "*/3 * * * * ?" // 每隔5秒执行一次
-	spec2 := "0 */1 * * * ?" // 每隔1分钟执行一次
+	spec1 := "*/3 * * * * ?"  // 每隔5秒执行一次
+	spec2 := "0 */1 * * * ?"  // 每隔1分钟执行一次
+	spec3 := "*/20 * * * * ?" // 每隔20秒执行一次
 
 	// 足球比分变量
 	c.AddJob(spec1, task.ScoreChangeFootball{})
@@ -62,6 +63,9 @@ func main() {
 
 	// 足球 主盘口即时赔率（全量）
 	c.AddJob(spec2, task.OddsFootball{})
+
+	// 篮球 技术统计 （某场比赛的技术统计和球员统计）
+	c.AddJob(spec3, task.StatsBasketball{})
 
 	//启动计划任务
 	c.Start()

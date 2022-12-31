@@ -137,7 +137,7 @@ type OverUnderChange struct {
 	OddsType      int     `json:"odds_type"`       // 0无类型数据 1早餐盘 2赛前即时盘 3走地盘
 }
 
-type respOddsChange struct {
+type RespOddsChange struct {
 	EuropeOdds []EuropeOddsChange `json:"europe_odds"` // 欧赔（胜平负） 变量
 	OverUnder  []OverUnderChange  `json:"over_under"`  // 大小球数据 变量
 }

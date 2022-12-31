@@ -84,7 +84,7 @@ func oddsChange(url string, odType string) {
 		oucArr = append(oucArr, ouNew)
 	}
 
-	rc := respOddsChange{
+	rc := RespOddsChange{
 		EuropeOdds: eocArr,
 		OverUnder:  oucArr,
 	}

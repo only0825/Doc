@@ -35,6 +35,7 @@ apiB:
   oddsChange: "http://api.wuhaicj.com/api/liveScore/change" # 足球即时比分 变量
   score: "http://api.wuhaicj.com/api/liveScore/change" # 足球即时比分 变量
   scoreChange: "http://api.wuhaicj.com/api/liveScore/change" # 足球即时比分 变量
+  stats: "http://api.wuhaicj.com/api/feijing/stats" # 技术统计
 
 
 
