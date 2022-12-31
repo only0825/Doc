@@ -26,7 +26,7 @@ func init() {
 
 	file, err := os.OpenFile(path+time.Now().Format("20060102")+".log", os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0766)
 	if err != nil {
-		log.Fatalln("Faild to open error zlog file:", err)
+		log.Fatalln("Faild to open error log file:", err)
 	}
 	//自定义日志格式
 	Info = log.New(io.MultiWriter(file, os.Stderr), "INFO: ", log.Ldate|log.Ltime|log.Lshortfile)

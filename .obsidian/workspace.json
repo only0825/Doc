@@ -1,0 +1,158 @@
+{
+  "main": {
+    "id": "62e6dc86b432c836",
+    "type": "split",
+    "children": [
+      {
+        "id": "35708c72ee7e1785",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "5165f63383403a26",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "Daily/2022-12-31.md",
+                "mode": "source",
+                "source": false
+              }
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "vertical"
+  },
+  "left": {
+    "id": "e41660755f77c1ee",
+    "type": "split",
+    "children": [
+      {
+        "id": "a85aed4107598beb",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "1896499bca86f0d1",
+            "type": "leaf",
+            "state": {
+              "type": "file-explorer",
+              "state": {
+                "sortOrder": "alphabetical"
+              }
+            }
+          },
+          {
+            "id": "1b49f6c6ef95e526",
+            "type": "leaf",
+            "state": {
+              "type": "search",
+              "state": {
+                "query": "",
+                "matchingCase": false,
+                "explainSearch": false,
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical"
+              }
+            }
+          },
+          {
+            "id": "9b0d4dab421e9152",
+            "type": "leaf",
+            "state": {
+              "type": "starred",
+              "state": {}
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300
+  },
+  "right": {
+    "id": "faa2af8c15348bec",
+    "type": "split",
+    "children": [
+      {
+        "id": "7a801f21aac7972d",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "f935d78480886572",
+            "type": "leaf",
+            "state": {
+              "type": "backlink",
+              "state": {
+                "file": "Daily/2022-12-31.md",
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical",
+                "showSearch": false,
+                "searchQuery": "",
+                "backlinkCollapsed": false,
+                "unlinkedCollapsed": true
+              }
+            }
+          },
+          {
+            "id": "2cf783f4ea47e7c4",
+            "type": "leaf",
+            "state": {
+              "type": "outgoing-link",
+              "state": {
+                "file": "Daily/2022-12-31.md",
+                "linksCollapsed": false,
+                "unlinkedCollapsed": true
+              }
+            }
+          },
+          {
+            "id": "4b5965bd526b6f46",
+            "type": "leaf",
+            "state": {
+              "type": "tag",
+              "state": {
+                "sortOrder": "frequency",
+                "useHierarchy": true
+              }
+            }
+          },
+          {
+            "id": "1197f9bae4d35716",
+            "type": "leaf",
+            "state": {
+              "type": "outline",
+              "state": {
+                "file": "Daily/2022-12-31.md"
+              }
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300
+  },
+  "left-ribbon": {
+    "hiddenItems": {
+      "switcher:Open quick switcher": false,
+      "graph:Open graph view": false,
+      "canvas:Create new canvas": false,
+      "daily-notes:Open today's daily note": false,
+      "templates:Insert template": false,
+      "command-palette:Open command palette": false
+    }
+  },
+  "active": "5165f63383403a26",
+  "lastOpenFiles": [
+    "即时比分消息推送.md",
+    "Users/wh37/Library/Application.md",
+    "渠道统计需求文档.md",
+    "直播需求.md",
+    "踩过的坑.md",
+    "README.md",
+    "Redis/imgs/Redis value type.png"
+  ]
+}
