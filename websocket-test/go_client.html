@@ -14,6 +14,7 @@
 <button onclick="onSubmit()" msgId="button" id="submit">Click Me!</button>
 <button onclick="onFor()" msgId="button">For Me!</button>
 <button onclick="Hello()" msgId="button">Hello!</button>
+
 <button onclick="Broadcast()" msgId="button">Broadcast!</button>
 <script src="https://cdn.bootcss.com/crypto-js/3.1.9-1/crypto-js.min.js"></script>
 
@@ -40,7 +41,7 @@
         // 创建websocket
         ws = new WebSocket("ws://47.243.109.82:6039/change"); // 测试环境
         //  ws = new WebSocket("ws://127.0.0.1:6039/change?token=d5mR1PmrdFBOy9bkga82ViWDwCA%3D&EIO=3"); // 本地环境
-        // ws = new WebSocket("ws://127.0.0.1:6039/change); // 本地环境
+        // ws = new WebSocket("ws://127.0.0.1:6039/change"); // 本地环境
         // 当socket连接打开时，输入用户名
         ws.onopen = onopen;
         // 当有消息时根据消息类型显示不同信息
@@ -125,20 +126,6 @@
                 flush_client_list();
                 break;
         }
-    }
-
-    function encrypt(plainText, key) {
-        const iv = CryptoJS.randomBytes(key)
-        const cipher = CryptoJS.createCipheriv("aes-256-cbc", key, 1123);
-        let cipherText;
-        try {
-            cipherText = cipher.update(plainText, 'utf8', 'hex');
-            cipherText += cipher.final('hex');
-            cipherText = iv.toString('hex') + cipherText
-        } catch (e) {
-            cipherText = null;
-        }
-        return cipherText;
     }
 
 </script>

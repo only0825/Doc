@@ -6,5 +6,7 @@ import (
 )
 
 var DB *gorm.DB
-var Rdbc *redis.ClusterClient
-var Rdb *redis.Client
+
+var Rdb *redis.ClusterClient
+
+//var Rdb *redis.Client

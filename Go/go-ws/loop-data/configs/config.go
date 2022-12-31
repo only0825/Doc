@@ -42,7 +42,6 @@ type AppConfig struct {
 	RedisCluster map[int]string
 	ApiF         ApiF
 	ApiB         ApiB
-	Cache        string
 }
 
 var Conf *AppConfig

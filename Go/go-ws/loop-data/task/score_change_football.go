@@ -4,9 +4,9 @@ import (
 	"encoding/json"
 	"github.com/sirupsen/logrus"
 	"io"
-	"loop-data/common"
 	"loop-data/configs"
 	"loop-data/model"
+	"loop-data/utils"
 	"net/http"
 	"time"
 )
@@ -21,7 +21,7 @@ func (this ScoreChangeFootball) Run() {
 
 // 足球比分 当天比赛的比分数据（20秒变量）
 func scoreChange(url string, scType string) {
-	var cache = model.Rdbc
+	var cache = model.Rdb
 
 	resp, err := http.Get(url)
 	if err != nil {
@@ -82,14 +82,14 @@ func scoreChange(url string, scType string) {
 
 	// 二、存Redis （给推送服务用）  一分钟内相同的数据不写入scoreChange中
 	isHave, _ := cache.Get(ctx, "scoreChangeTemp:"+scType).Result()
-	if (isHave != "") && (isHave == common.Md5String(string(clByte))) {
+	if (isHave != "") && (isHave == utils.Md5String(string(clByte))) {
 		return
 	}
 
 	// 开启Redis事务
 	pipe := cache.TxPipeline()
 	// 临时存放去重
-	pipe.Set(ctx, "scoreChangeTemp:"+scType, common.Md5String(string(clByte)), time.Duration(60)*time.Second)
+	pipe.Set(ctx, "scoreChangeTemp:"+scType, utils.Md5String(string(clByte)), time.Duration(60)*time.Second)
 	// 将获取到的数据存入到Redis队列
 	pipe.LPush(ctx, "scoreChange:"+scType, string(clByte))
 	_, err = pipe.Exec(ctx)

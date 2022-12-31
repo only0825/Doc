@@ -1,11 +1,13 @@
 package main
 
 import (
+	"fmt"
 	"github.com/robfig/cron/v3"
 	"github.com/sirupsen/logrus"
-	"loop-data/common"
 	"loop-data/configs"
+	"loop-data/model"
 	"loop-data/task"
+	"loop-data/utils"
 	"os"
 )
 
@@ -17,10 +19,8 @@ func newWithSeconds() *cron.Cron {
 }
 
 func main() {
-	// 设置在输出日志中添加文件名和方法信息
-	logrus.SetReportCaller(true)
-	logrus.SetLevel(logrus.TraceLevel)
-	//logrus.SetFormatter(&logrus.JSONFormatter{})
+	fmt.Println("staring loop ...")
+	utils.LogInit("/loop-data.log")
 
 	var err error
 	// 获取命令行参数
@@ -35,14 +35,16 @@ func main() {
 		return
 	}
 
-	cache := configs.Conf.Cache
-	err = common.InitCache(cache)
+	//rdb, err := utils.InitRedis()
+	//model.Rdb = rdb
+	rdb, err := utils.InitRedisCluster()
+	model.Rdb = rdb
 	if err != nil {
 		logrus.Error("Redis初始化错误:", err)
 		return
 	}
 
-	err = common.InitMysql()
+	err = utils.InitMysql()
 	if err != nil {
 		logrus.Error("数据库初始化失败: ", err)
 		return
