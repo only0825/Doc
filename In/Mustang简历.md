@@ -2,28 +2,22 @@
 
 * **Mustang**/男/27/四川/大专
 * ⼯作年限：4年+
-* 期望职位：远程PHP开发
+* 期望职位：PHP开发
 * 期望薪资：面议
 
 **技能总结**
 
-PHP > Java > Golang > JS > Python
-
 1. 框架：熟悉TP6、Laravel、Gin、SpringBoot。
 2. 熟练使⽤Redis和MySql。
-3. 熟悉docker、etcd。
 4. 熟练掌握Linux 基本命令，能搭建环境。
 5. 常用工具：Git、GitLab、GitHub、Postman、Docker。
 6. 能看英文文档。
-7. 主导过体育直播项目，目前已稳定上线
-
-
 
 
 
 ### ⼯作经历
 
-#### CG集团 **2020年4⽉-2022年7月**   薪资：40K + 分红
+#### CG集团 **2020年4⽉-2022年7月**   薪资：35K + 分红
 
 **公司介绍**
 

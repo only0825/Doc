@@ -1,21 +1,26 @@
 package task
 
 import (
+	"encoding/json"
 	"github.com/sirupsen/logrus"
 	"io"
 	"loop-data/configs"
+	"loop-data/model"
 	"net/http"
+	"strconv"
+	"time"
 )
 
 type StatsBasketball struct {
 }
 
 func (this StatsBasketball) Run() {
-	logrus.Info("篮球技术统计 StatsBasketball start")
 	stats(configs.Conf.ApiB.Stats, "")
 }
 
 func stats(url string, scType string) {
+	var cache = model.Rdb
+
 	resp, err := http.Get(url)
 	if err != nil {
 		logrus.Error("请求失败:", err.Error())
@@ -34,6 +39,22 @@ func stats(url string, scType string) {
 		return
 	}
 
+	var mla = MatchListArr{}
+	err = json.Unmarshal(body, &mla)
+	if err != nil {
+		logrus.Error("json 反序列化错误", err)
+		return
+	}
+
+	for i := range mla.MatchList {
+		matchId := mla.MatchList[i].MatchID
+		marshal, _ := json.Marshal(mla.MatchList[i])
+		length := strconv.Itoa(len(marshal))
+		value := "s:" + length + ":\"" + string(marshal) + "\";" // PHP存取的时候必须要是这个结构
+		cache.Set(ctx, "basketball:stats:"+strconv.Itoa(matchId), value, time.Duration(604800)*time.Second)
+	}
+
+	logrus.Info("篮球技术统计 Redis 存储成功！")
 }
 
 type MatchListArr struct {

@@ -4,19 +4,15 @@
     "type": "split",
     "children": [
       {
-        "id": "35708c72ee7e1785",
+        "id": "22804841e81cb08a",
         "type": "tabs",
         "children": [
           {
-            "id": "5165f63383403a26",
+            "id": "c79da01b6acbc8d7",
             "type": "leaf",
             "state": {
-              "type": "markdown",
-              "state": {
-                "file": "Daily/2022-12-31.md",
-                "mode": "source",
-                "source": false
-              }
+              "type": "empty",
+              "state": {}
             }
           }
         ]
@@ -85,7 +81,6 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "Daily/2022-12-31.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +97,6 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "Daily/2022-12-31.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -124,9 +118,7 @@
             "type": "leaf",
             "state": {
               "type": "outline",
-              "state": {
-                "file": "Daily/2022-12-31.md"
-              }
+              "state": {}
             }
           }
         ]
@@ -145,15 +137,17 @@
       "command-palette:Open command palette": false
     }
   },
-  "active": "5165f63383403a26",
+  "active": "c79da01b6acbc8d7",
   "lastOpenFiles": [
-    "即时比分消息推送.md",
+    "Daily/2023-01-01.md",
+    "Pasted image 20230101130202.png",
+    "Pasted image 20230101130004.png",
     "Daily/2022-12-31.md",
+    "即时比分消息推送.md",
     "Users/wh37/Library/Application.md",
     "渠道统计需求文档.md",
     "直播需求.md",
     "踩过的坑.md",
-    "README.md",
-    "Redis/imgs/Redis value type.png"
+    "README.md"
   ]
 }

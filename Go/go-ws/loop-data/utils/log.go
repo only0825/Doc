@@ -13,7 +13,7 @@ func LogInit(fileName string) {
 	if err != nil {
 		err = os.MkdirAll(path, 0777)
 		if err != nil {
-			logrus.Fatal("创建日志目录错误", err)
+			logrus.Error("创建日志目录错误", err)
 		}
 	}
 	// 设置在输出日志中添加文件名和方法信息

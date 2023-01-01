@@ -25,18 +25,20 @@ redis:
   timeout: 3600
   select: 0
 
+# 足球
 apiF:
   odds: "http://interface.bet007.com/football/odds.aspx" # 主盘口即时赔率（全量）
   oddsChange: "http://interface.bet007.com/football/oddsChange.aspx" # 主盘口即时赔率（30秒变量）
   score: "http://interface.bet007.com/football/today.aspx" # 当天比赛的比分数据（全量）
   scoreChange: "http://interface.bet007.com/football/change.aspx" # 当天比赛的比分数据（20秒变量）
 
+# 篮球
 apiB:
-  odds: "http://api.wuhaicj.com/api/liveScore/change" # 足球即时比分 变量
-  oddsChange: "http://api.wuhaicj.com/api/liveScore/change" # 足球即时比分 变量
-  score: "http://api.wuhaicj.com/api/liveScore/change" # 足球即时比分 变量
-  scoreChange: "http://api.wuhaicj.com/api/liveScore/change" # 足球即时比分 变量
-  stats: "http://interface.win007.com/basketball/stats.aspx" # 技术统计
+  odds: "" # 篮球即时比分 变量
+  oddsChange: "" # 篮球即时比分 变量
+  score: "" # 篮球即时比分 变量
+  scoreChange: "" # 篮球即时比分 变量
+  stats: "http://interface.bet007.com/basketball/stats.aspx" # 技术统计
 
 
 

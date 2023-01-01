@@ -3,15 +3,15 @@ package utils
 import (
 	"crypto/md5"
 	"fmt"
+	"github.com/sirupsen/logrus"
 	"io"
-	"log"
 )
 
 func Md5String(str string) string {
 	m := md5.New()
 	_, err := io.WriteString(m, str)
 	if err != nil {
-		log.Fatal(err)
+		logrus.Error(err)
 	}
 	arr := m.Sum(nil)
 	return fmt.Sprintf("%x", arr)

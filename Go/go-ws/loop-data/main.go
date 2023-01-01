@@ -35,10 +35,10 @@ func main() {
 		return
 	}
 
-	//rdb, err := utils.InitRedis()
-	//model.Rdb = rdb
-	rdb, err := utils.InitRedisCluster()
+	rdb, err := utils.InitRedis()
 	model.Rdb = rdb
+	//rdb, err := utils.InitRedisCluster()
+	//model.Rdb = rdb
 	if err != nil {
 		logrus.Error("Redis初始化错误:", err)
 		return

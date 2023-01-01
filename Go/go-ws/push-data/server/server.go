@@ -130,7 +130,6 @@ func (s *Server) Stop() {
 // 运行服务
 func (s *Server) Serve(c *gin.Context) {
 	s.Start(c)
-	//TODO Server.Serve() 是否在启动服务的时候 还要处理其他的事情呢 可以在这里添加
 
 	go func() {
 		for {
