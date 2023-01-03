@@ -16,7 +16,6 @@ type OddsChangeFootball struct {
 }
 
 func (this OddsChangeFootball) Run() {
-	//logrus.Info("足球指数变量 TaskOddsFootball start")
 	oddsChange(configs.Conf.ApiF.OddsChange, "Football")
 }
 
@@ -113,7 +112,10 @@ func oddsChange(url string, odType string) {
 		return
 	}
 
-	logrus.Info("足球指数变量 Redis 存储成功！")
+	logrus.Info("足球-指数-变量 Redis 存储成功！")
+
+	// 三、更新数据库数据
+	updateChangeOdds(rc)
 }
 
 func newOddsEuropeChange(s []interface{}) *EuropeOddsChange {
@@ -154,6 +156,44 @@ func newOddsEuropeChange(s []interface{}) *EuropeOddsChange {
 	return eo
 }
 
+func updateChangeOdds(rc RespOddsChange) {
+	for i := range rc.EuropeOdds {
+		var e = rc.EuropeOdds[i]
+		var eo = model.EuropeOdds{
+			MatchId:         e.MatchId,
+			HomeWinMainOdds: e.HomeWinMainOdds,
+			TieMainOdds:     e.TieMainOdds,
+			AwayWinMainOdds: e.AwayWinMainOdds,
+			ChangeTime:      e.ChangeTime,
+			IsClose:         boolToInt(e.IsClose),
+			OddsType:        e.OddsType,
+			UpdateTime:      time.Now().Format("2006/01/02 15:04:05"),
+		}
+		err := model.OeUpdate(eo)
+		if err != nil {
+			return
+		}
+	}
+
+	for i := range rc.OverUnder {
+		var o = rc.OverUnder[i]
+		var ou = model.OverUnder{
+			MatchId:       o.MatchId,
+			HandicapOdds:  o.HandicapOdds,
+			BigBallOdds:   o.BigBallOdds,
+			SmallBallOdds: o.SmallBallOdds,
+			ChangeTime:    o.ChangeTime,
+			IsClose:       boolToInt(o.IsClose),
+			OddsType:      o.OddsType,
+			UpdateTime:    time.Now().Format("2006/01/02 15:04:05"),
+		}
+		err := model.OuUpdate(ou)
+		if err != nil {
+			return
+		}
+	}
+}
+
 func newOverUnderChange(s []interface{}) *OverUnderChange {
 	ouc := &OverUnderChange{}
 
@@ -190,4 +230,11 @@ func newOverUnderChange(s []interface{}) *OverUnderChange {
 	}
 
 	return ouc
+}
+
+func boolToInt(b bool) int {
+	if b {
+		return 1
+	}
+	return 2
 }

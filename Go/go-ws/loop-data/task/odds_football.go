@@ -7,6 +7,7 @@ import (
 	"loop-data/configs"
 	"loop-data/model"
 	"net/http"
+	"time"
 )
 
 // 足球指数 全量
@@ -104,6 +105,7 @@ func odds(url string) {
 			ChangeTime:         ou.ChangeTime,
 			IsClose:            isClose,
 			OddsType:           ou.OddsType,
+			UpdateTime:         time.Now().Format("2006/01/02 15:04:05"),
 		}
 		find, err := model.OuFind(ouNew.MatchId)
 		if err != nil {
@@ -122,7 +124,7 @@ func odds(url string) {
 		}
 	}
 
-	logrus.Info("足球指数全量 Mysql 存储成功！")
+	logrus.Info("足球-指数-全量 Mysql 存储成功！")
 }
 
 func newOddsEurope(s []interface{}) *EuropeOdds {

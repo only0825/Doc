@@ -35,10 +35,10 @@ func main() {
 		return
 	}
 
-	rdb, err := utils.InitRedis()
-	model.Rdb = rdb
-	//rdb, err := utils.InitRedisCluster()
+	//rdb, err := utils.InitRedis()
 	//model.Rdb = rdb
+	rdb, err := utils.InitRedisCluster()
+	model.Rdb = rdb
 	if err != nil {
 		logrus.Error("Redis初始化错误:", err)
 		return
@@ -57,13 +57,13 @@ func main() {
 
 	// 足球比分变量
 	c.AddJob(spec1, task.ScoreChangeFootball{})
-
 	// 足球指数变量
 	c.AddJob(spec1, task.OddsChangeFootball{})
-
-	// 足球 主盘口即时赔率（全量）
+	// 足球指数全量
 	c.AddJob(spec2, task.OddsFootball{})
 
+	// 篮球比分变量
+	c.AddJob(spec1, task.ScoreChangeBasketball{})
 	// 篮球 技术统计 （某场比赛的技术统计和球员统计）
 	c.AddJob(spec3, task.StatsBasketball{})
 

@@ -15,10 +15,10 @@ type StatsBasketball struct {
 }
 
 func (this StatsBasketball) Run() {
-	stats(configs.Conf.ApiB.Stats, "")
+	stats2(configs.Conf.ApiB.Stats, "")
 }
 
-func stats(url string, scType string) {
+func stats2(url string, scType string) {
 	var cache = model.Rdb
 
 	resp, err := http.Get(url)
@@ -51,10 +51,10 @@ func stats(url string, scType string) {
 		marshal, _ := json.Marshal(mla.MatchList[i])
 		length := strconv.Itoa(len(marshal))
 		value := "s:" + length + ":\"" + string(marshal) + "\";" // PHP存取的时候必须要是这个结构
-		cache.Set(ctx, "basketball:stats:"+strconv.Itoa(matchId), value, time.Duration(604800)*time.Second)
+		cache.Set(ctx, "stats:basketball:"+strconv.Itoa(matchId), value, time.Duration(604800)*time.Second)
 	}
 
-	logrus.Info("篮球技术统计 Redis 存储成功！")
+	logrus.Info("篮球-技术统计 Redis 存储成功！")
 }
 
 type MatchListArr struct {

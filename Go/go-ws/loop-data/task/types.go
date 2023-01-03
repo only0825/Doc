@@ -6,52 +6,6 @@ import (
 
 var ctx = context.Background()
 
-type ScoreChangeList struct {
-	ChangeList []ChangeList `json:"changeList"`
-}
-
-type ChangeList struct {
-	MatchId       int    `json:"matchId"`       // 比赛ID
-	State         int    `json:"state"`         // 比赛
-	HomeScore     int    `json:"homeScore"`     // 主队得分
-	AwayScore     int    `json:"awayScore"`     // 客队得分
-	HomeHalfScore int    `json:"homeHalfScore"` // 主队上半场得分
-	AwayHalfScore int    `json:"awayHalfScore"` // 客队上半场得分
-	HomeRed       int    `json:"homeRed"`       // 主队红牌数
-	AwayRed       int    `json:"awayRed"`       // 客队红牌数
-	HomeYellow    int    `json:"homeYellow"`    // 主队黄牌数
-	AwayYellow    int    `json:"awayYellow"`    // 客队红牌数
-	HomeCorner    int    `json:"homeCorner"`    // 主队角球数
-	AwayCorner    int    `json:"awayCorner"`    // 客队角球数
-	HasLineup     string `json:"hasLineup"`     // 是否有阵容
-	MatchTime     string `json:"matchTime"`     // 比赛时间
-	StartTime     string `json:"startTime"`     // 开场时间
-	Explain       string `json:"explain"`       // 比赛说明
-	ExtraExplain  string `json:"extraExplain"`  // 比赛说明2
-	InjuryTime    string `json:"injuryTime"`    // 上下半场补时时长
-}
-
-type ChangeListJson struct {
-	MatchId       int    `json:"match_id"`        // 比赛ID
-	State         int    `json:"state"`           // 比赛
-	HomeScore     int    `json:"home_score"`      // 主队得分
-	AwayScore     int    `json:"away_score"`      // 客队得分
-	HomeHalfScore int    `json:"home_half_score"` // 主队上半场得分
-	AwayHalfScore int    `json:"away_half_score"` // 客队上半场得分
-	HomeRed       int    `json:"home_red"`        // 主队红牌数
-	AwayRed       int    `json:"away_red"`        // 客队红牌数
-	HomeYellow    int    `json:"home_yellow"`     // 主队黄牌数
-	AwayYellow    int    `json:"away_yellow"`     // 客队红牌数
-	HomeCorner    int    `json:"home_corner"`     // 主队角球数
-	AwayCorner    int    `json:"away_corner"`     // 客队角球数
-	HasLineup     string `json:"has_lineup"`      // 是否有阵容
-	MatchTime     string `json:"match_time"`      // 比赛时间
-	StartTime     string `json:"start_time"`      // 开场时间
-	Explain       string `json:"explain"`         // 比赛说明
-	ExtraExplain  string `json:"extra_explain"`   // 比赛说明2
-	InjuryTime    string `json:"injury_time"`     // 上下半场补时时长
-}
-
 type Odds struct {
 	List []struct {
 		Handicap      [][]interface{} `json:"handicap"`

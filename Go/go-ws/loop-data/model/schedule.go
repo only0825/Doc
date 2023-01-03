@@ -1,33 +1,21 @@
 package model
 
-import (
-	"github.com/sirupsen/logrus"
-	"time"
-)
-
-func UpdateScore(changes []Change) {
-	var table = "hn_schedule_copy1"
-	for i := range changes {
-		var c = changes[i]
-		var sc = Schedule{
-			MatchId:       c.MatchId,
-			State:         c.State,
-			HomeScore:     c.HomeScore,
-			AwayScore:     c.AwayScore,
-			HomeHalfScore: c.HomeHalfScore,
-			AwayHalfScore: c.AwayHalfScore,
-			HomeRed:       c.HomeRed,
-			AwayRed:       c.AwayRed,
-			HomeYellow:    c.HomeYellow,
-			AwayYellow:    c.AwayYellow,
-			HomeCorner:    c.HomeCorner,
-			AwayCorner:    c.AwayCorner,
-			UpdateTime:    time.Now().Format("2006/01/02 15:04:05"),
-		}
-
-		err := DB.Table(table).Where("matchId = ?", sc.MatchId).Updates(sc).Error
-		if err != nil {
-			logrus.Error("数据库更新分数错误：", err)
-		}
+// 更新足球赛程表
+func UpdateScore1(sc Schedule1) error {
+	var table = "hn_schedule"
+	err := DB.Table(table).Where("matchId = ?", sc.MatchId).Updates(sc).Error
+	if err != nil {
+		return err
 	}
+	return nil
+}
+
+// 更新篮球赛程表
+func UpdateScore2(sc Schedule2) error {
+	var table = "hn_basketball_schedule"
+	err := DB.Table(table).Where("matchId = ?", sc.MatchId).Updates(sc).Error
+	if err != nil {
+		return err
+	}
+	return nil
 }
