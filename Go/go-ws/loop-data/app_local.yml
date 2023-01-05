@@ -29,6 +29,7 @@ apiF:
   oddsChange: "http://api.wuhaicj.com/api/feijing/oddsChange" # 主盘口即时赔率（30秒变量）
   score: "http://interface.bet007.com/football/today.aspx" # 当天比赛的比分数据（全量）
   scoreChange: "http://api.wuhaicj.com/api/feijing/change" # 主盘口即时赔率（30秒变量）
+  anime: "http://api.wuhaicj.com/api/feijing/anime1" # 足球动画直播比赛赛程赛果
 
 apiB:
   odds: "" # 篮球指数 变量

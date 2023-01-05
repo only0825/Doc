@@ -27,6 +27,7 @@ type ApiF struct {
 	OddsChange  string `yaml:"oddsChange"`
 	Score       string `yaml:"score"`
 	ScoreChange string `yaml:"scoreChange"`
+	Anime       string `yaml:"Anime"`
 }
 
 type ApiB struct {
@@ -34,7 +35,7 @@ type ApiB struct {
 	OddsChange  string `yaml:"oddsChange"`
 	Score       string `yaml:"score"`
 	ScoreChange string `yaml:"scoreChange"`
-	Stats       string `yaml:"  stats"`
+	Stats       string `yaml:"stats"`
 }
 
 type AppConfig struct {

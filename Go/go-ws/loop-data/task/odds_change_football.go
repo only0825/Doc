@@ -8,6 +8,7 @@ import (
 	"loop-data/model"
 	"loop-data/utils"
 	"net/http"
+	"strconv"
 	"time"
 )
 
@@ -62,6 +63,9 @@ func oddsChange(url string, odType string) {
 			IsClose:         neo.IsClose,
 			OddsType:        neo.OddsType,
 		}
+		// 根据比赛ID存缓存，如果HTTP接口会先查缓存中的数据，再查数据库
+		match, _ := json.Marshal(oeNew)
+		cache.Set(ctx, "newest:odds:f:europe:"+strconv.Itoa(oeNew.MatchId), string(match), time.Duration(120)*time.Second)
 		eocArr = append(eocArr, oeNew)
 	}
 
@@ -80,6 +84,9 @@ func oddsChange(url string, odType string) {
 			IsClose:       nouc.IsClose,
 			OddsType:      nouc.OddsType,
 		}
+		// 根据比赛ID存缓存，如果HTTP接口会先查缓存中的数据，再查数据库
+		match, _ := json.Marshal(ouNew)
+		cache.Set(ctx, "newest:odds:f:overunder:"+strconv.Itoa(ouNew.MatchId), string(match), time.Duration(120)*time.Second)
 		oucArr = append(oucArr, ouNew)
 	}
 
@@ -115,7 +122,7 @@ func oddsChange(url string, odType string) {
 	logrus.Info("足球-指数-变量 Redis 存储成功！")
 
 	// 三、更新数据库数据
-	updateChangeOdds(rc)
+	//updateChangeOdds(rc)
 }
 
 func newOddsEuropeChange(s []interface{}) *EuropeOddsChange {
@@ -156,43 +163,43 @@ func newOddsEuropeChange(s []interface{}) *EuropeOddsChange {
 	return eo
 }
 
-func updateChangeOdds(rc RespOddsChange) {
-	for i := range rc.EuropeOdds {
-		var e = rc.EuropeOdds[i]
-		var eo = model.EuropeOdds{
-			MatchId:         e.MatchId,
-			HomeWinMainOdds: e.HomeWinMainOdds,
-			TieMainOdds:     e.TieMainOdds,
-			AwayWinMainOdds: e.AwayWinMainOdds,
-			ChangeTime:      e.ChangeTime,
-			IsClose:         boolToInt(e.IsClose),
-			OddsType:        e.OddsType,
-			UpdateTime:      time.Now().Format("2006/01/02 15:04:05"),
-		}
-		err := model.OeUpdate(eo)
-		if err != nil {
-			return
-		}
-	}
-
-	for i := range rc.OverUnder {
-		var o = rc.OverUnder[i]
-		var ou = model.OverUnder{
-			MatchId:       o.MatchId,
-			HandicapOdds:  o.HandicapOdds,
-			BigBallOdds:   o.BigBallOdds,
-			SmallBallOdds: o.SmallBallOdds,
-			ChangeTime:    o.ChangeTime,
-			IsClose:       boolToInt(o.IsClose),
-			OddsType:      o.OddsType,
-			UpdateTime:    time.Now().Format("2006/01/02 15:04:05"),
-		}
-		err := model.OuUpdate(ou)
-		if err != nil {
-			return
-		}
-	}
-}
+//func updateChangeOdds(rc RespOddsChange) {
+//	for i := range rc.EuropeOdds {
+//		var e = rc.EuropeOdds[i]
+//		var eo = model.EuropeOdds{
+//			MatchId:         e.MatchId,
+//			HomeWinMainOdds: e.HomeWinMainOdds,
+//			TieMainOdds:     e.TieMainOdds,
+//			AwayWinMainOdds: e.AwayWinMainOdds,
+//			ChangeTime:      e.ChangeTime,
+//			IsClose:         boolToInt(e.IsClose),
+//			OddsType:        e.OddsType,
+//			UpdateTime:      time.Now().Format("2006/01/02 15:04:05"),
+//		}
+//		err := model.OeUpdate(eo)
+//		if err != nil {
+//			return
+//		}
+//	}
+//
+//	for i := range rc.OverUnder {
+//		var o = rc.OverUnder[i]
+//		var ou = model.OverUnder{
+//			MatchId:       o.MatchId,
+//			HandicapOdds:  o.HandicapOdds,
+//			BigBallOdds:   o.BigBallOdds,
+//			SmallBallOdds: o.SmallBallOdds,
+//			ChangeTime:    o.ChangeTime,
+//			IsClose:       boolToInt(o.IsClose),
+//			OddsType:      o.OddsType,
+//			UpdateTime:    time.Now().Format("2006/01/02 15:04:05"),
+//		}
+//		err := model.OuUpdate(ou)
+//		if err != nil {
+//			return
+//		}
+//	}
+//}
 
 func newOverUnderChange(s []interface{}) *OverUnderChange {
 	ouc := &OverUnderChange{}

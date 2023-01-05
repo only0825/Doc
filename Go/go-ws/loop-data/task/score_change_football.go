@@ -8,6 +8,7 @@ import (
 	"loop-data/model"
 	"loop-data/utils"
 	"net/http"
+	"strconv"
 	"time"
 )
 
@@ -98,30 +99,36 @@ func scoreChange(url string, scType string) {
 
 	logrus.Info("足球-比分-变量 Redis 存储成功！")
 
-	// 三、更新数据库表
 	for i := range scl.ChangeList {
-		var c = scl.ChangeList[i]
-		var sc = model.Schedule1{
-			MatchId:       c.MatchId,
-			State:         c.State,
-			HomeScore:     c.HomeScore,
-			AwayScore:     c.AwayScore,
-			HomeHalfScore: c.HomeHalfScore,
-			AwayHalfScore: c.AwayHalfScore,
-			HomeRed:       c.HomeRed,
-			AwayRed:       c.AwayRed,
-			HomeYellow:    c.HomeYellow,
-			AwayYellow:    c.AwayYellow,
-			HomeCorner:    c.HomeCorner,
-			AwayCorner:    c.AwayCorner,
-			UpdateTime:    time.Now().Format("2006/01/02 15:04:05"),
-		}
-		err = model.UpdateScore1(sc)
-		if err != nil {
-			logrus.Error("足球-数据库更新分数错误：", err)
-			return
-		}
+		cl := scl.ChangeList[i]
+		match, _ := json.Marshal(cl)
+		cache.Set(ctx, "newest:score:f:"+strconv.Itoa(cl.MatchId), string(match), time.Duration(120)*time.Second)
 	}
 
-	logrus.Info("足球-比分-变量 Mysql 更新成功！")
+	// 三、更新数据库表
+	//for i := range scl.ChangeList {
+	//	var c = scl.ChangeList[i]
+	//	var sc = model.Schedule1{
+	//		MatchId:       c.MatchId,
+	//		State:         c.State,
+	//		HomeScore:     c.HomeScore,
+	//		AwayScore:     c.AwayScore,
+	//		HomeHalfScore: c.HomeHalfScore,
+	//		AwayHalfScore: c.AwayHalfScore,
+	//		HomeRed:       c.HomeRed,
+	//		AwayRed:       c.AwayRed,
+	//		HomeYellow:    c.HomeYellow,
+	//		AwayYellow:    c.AwayYellow,
+	//		HomeCorner:    c.HomeCorner,
+	//		AwayCorner:    c.AwayCorner,
+	//		UpdateTime:    time.Now().Format("2006/01/02 15:04:05"),
+	//	}
+	//	err = model.UpdateScore1(sc)
+	//	if err != nil {
+	//		logrus.Error("足球-数据库更新分数错误：", err)
+	//		return
+	//	}
+	//}
+	//
+	//logrus.Info("足球-比分-变量 Mysql 更新成功！")
 }

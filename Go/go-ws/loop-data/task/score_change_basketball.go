@@ -21,7 +21,7 @@ func (this ScoreChangeBasketball) Run() {
 
 type ScoreChangeList2 struct {
 	ChangeList []struct {
-		MatchID       int    `json:"matchId"`
+		MatchId       int    `json:"matchId"`
 		MatchState    int    `json:"matchState"`
 		RemainTime    string `json:"remainTime"`
 		OvertimeCount int    `json:"overtimeCount"`
@@ -102,39 +102,46 @@ func scoreChange2(url string, scType string) {
 
 	logrus.Info("篮球-比分-变量 Redis 存储成功！")
 
-	// 三、更新数据库表
+	// 根据比赛ID存缓存，如果HTTP接口会先查缓存中的数据，再查数据库
 	for i := range scl.ChangeList {
-		var c = scl.ChangeList[i]
-		var sc = model.Schedule2{
-			MatchId:    c.MatchID,
-			RemainTime: c.RemainTime,
-			State:      c.MatchState,
-			HomeScore:  convToInt(c.HomeScore),
-			Home1:      convToInt(c.Home1),
-			Home2:      convToInt(c.Home2),
-			Home3:      convToInt(c.Home3),
-			Home4:      convToInt(c.Home4),
-			HomeOT1:    convToInt(c.HomeOT1),
-			HomeOT2:    convToInt(c.HomeOT2),
-			HomeOT3:    convToInt(c.HomeOT3),
-			AwayScore:  convToInt(c.AwayScore),
-			Away1:      convToInt(c.Away1),
-			Away2:      convToInt(c.Away2),
-			Away3:      convToInt(c.Away3),
-			Away4:      convToInt(c.Away4),
-			AwayOT1:    convToInt(c.AwayOT1),
-			AwayOT2:    convToInt(c.AwayOT2),
-			AwayOT3:    convToInt(c.AwayOT3),
-			UpdateTime: time.Now().Format("2006/01/02 15:04:05"),
-		}
-		err = model.UpdateScore2(sc)
-		if err != nil {
-			logrus.Error("篮球-数据库更新分数错误：", err)
-			return
-		}
+		cl := scl.ChangeList[i]
+		match, _ := json.Marshal(cl)
+		cache.Set(ctx, "newest:score:b:"+strconv.Itoa(cl.MatchId), string(match), time.Duration(120)*time.Second)
 	}
 
-	logrus.Info("篮球-比分-变量 Mysql 更新成功！")
+	// 三、更新数据库表
+	//for i := range scl.ChangeList {
+	//	var c = scl.ChangeList[i]
+	//	var sc = model.Schedule2{
+	//		MatchId:    c.MatchID,
+	//		RemainTime: c.RemainTime,
+	//		State:      c.MatchState,
+	//		HomeScore:  convToInt(c.HomeScore),
+	//		Home1:      convToInt(c.Home1),
+	//		Home2:      convToInt(c.Home2),
+	//		Home3:      convToInt(c.Home3),
+	//		Home4:      convToInt(c.Home4),
+	//		HomeOT1:    convToInt(c.HomeOT1),
+	//		HomeOT2:    convToInt(c.HomeOT2),
+	//		HomeOT3:    convToInt(c.HomeOT3),
+	//		AwayScore:  convToInt(c.AwayScore),
+	//		Away1:      convToInt(c.Away1),
+	//		Away2:      convToInt(c.Away2),
+	//		Away3:      convToInt(c.Away3),
+	//		Away4:      convToInt(c.Away4),
+	//		AwayOT1:    convToInt(c.AwayOT1),
+	//		AwayOT2:    convToInt(c.AwayOT2),
+	//		AwayOT3:    convToInt(c.AwayOT3),
+	//		UpdateTime: time.Now().Format("2006/01/02 15:04:05"),
+	//	}
+	//	err = model.UpdateScore2(sc)
+	//	if err != nil {
+	//		logrus.Error("篮球-数据库更新分数错误：", err)
+	//		return
+	//	}
+	//}
+	//
+	//logrus.Info("篮球-比分-变量 Mysql 更新成功！")
 }
 
 func convToInt(s string) int {
