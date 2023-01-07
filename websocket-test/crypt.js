@@ -42,9 +42,11 @@ function decrypt(mode, cipherText, key, iv = null) {
 }
 
 function test() {
+    // AES的key，并算出偏移量iv
     const key = 'ef14b146e989b922dcb5a00a19f907c5';
     const md5Key = md5(key);
     const iv = md5Key.substr(0, 16);
+    // 从/api/live/signurl获取到的加密字符串
     const cipherText = 'deW54wdmNDrnRCgTeNMCTeo/Hfw8aWGrbaStBxNUKfdlvnfOr8o0y/5yq1jN3DeYWJbvWLLunPe2qhUXpmfwgcvm+iyxCUP7B4ZLtTLvj/AHigJD1y+elYn8eLn1ktmShFtwPrcDJajHfLvzL8VDaw==';
 
     let plainText = decrypt(CryptoJS.mode.CBC, cipherText, key, iv);

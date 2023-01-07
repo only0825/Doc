@@ -36,7 +36,7 @@ apiF:
 apiB:
   odds: "" # 篮球指数 变量
   oddsChange: "" # 篮球指数 变量
-  score: "" # 篮球比分 全量
+  score: "http://interface.bet007.com/basketball/today.aspx" # 篮球比分 全量
   scoreChange: "http://interface.bet007.com/basketball/change.aspx" # 篮球比分 变量
   stats: "http://interface.bet007.com/basketball/stats.aspx" # 技术统计
 

@@ -35,10 +35,10 @@ func main() {
 		return
 	}
 
-	//rdb, err := utils.InitRedis()
-	//model.Rdb = rdb
-	rdb, err := utils.InitRedisCluster()
+	rdb, err := utils.InitRedis()
 	model.Rdb = rdb
+	//rdb, err := utils.InitRedisCluster()
+	//model.Rdb = rdb
 	if err != nil {
 		logrus.Error("Redis初始化错误:", err)
 		return
@@ -55,21 +55,25 @@ func main() {
 	spec2 := "0 */1 * * * ?"  // 每隔1分钟执行一次
 	spec3 := "*/20 * * * * ?" // 每隔20秒执行一次
 	//spec4 := "0 */2 * * * ?"  // 每隔1分钟执行一次
+	spec5 := "*/6 * * * * ?" // 每隔6秒执行一次
 
 	// 足球比分变量   Redis 1.推送数据  2.最新数据
 	c.AddJob(spec1, task.ScoreChangeFootball{})
 
 	// 足球指数变量   Redis 1.推送数据  2.最新数据
-	c.AddJob(spec1, task.OddsChangeFootball{})
+	c.AddJob(spec5, task.OddsChangeFootball{})
 	// 足球指数全量   Mysql
 	c.AddJob(spec2, task.OddsFootball{})
 
 	// 篮球比分变量	Redis 1.推送数据  2.最新数据
 	c.AddJob(spec1, task.ScoreChangeBasketball{})
+	// 篮球比分全量   Mysql
+	//c.AddJob(spec1, task.ScoreBasketball{})
+
 	// 篮球 技术统计 （某场比赛的技术统计和球员统计） Redis
 	c.AddJob(spec3, task.StatsBasketball{})
 
-	// 动画直播赛程赛果  这是给前端判断比赛有没有动画直播 下个版本才做
+	// TODO 动画直播赛程赛果  这是给前端判断比赛有没有动画直播 下个版本才做
 	//c.AddJob(spec4, task.AnimeFootball{})
 
 	//启动计划任务

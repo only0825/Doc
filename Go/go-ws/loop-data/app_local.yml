@@ -34,7 +34,7 @@ apiF:
 apiB:
   odds: "" # 篮球指数 变量
   oddsChange: "" # 篮球指数 变量
-  score: "" # 篮球比分 全量
+  score: "http://api.wuhaicj.com/api/feijing/today2" # 篮球比分 全量
   scoreChange: "http://api.wuhaicj.com/api/feijing/change2" # 篮球比分 变量
   stats: "http://api.wuhaicj.com/api/feijing/stats" # 技术统计
 
