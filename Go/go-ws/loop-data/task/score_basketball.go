@@ -2,13 +2,11 @@ package task
 
 import (
 	"encoding/json"
-	"fmt"
 	"github.com/sirupsen/logrus"
 	"io"
 	"loop-data/configs"
 	"loop-data/model"
 	"net/http"
-	"os"
 	"time"
 )
 
@@ -74,13 +72,10 @@ func score2(url string) {
 		return
 	}
 
-	start := time.Now()
-
 	// 更新数据库表
 	for i := range sl2.MatchList {
 		var c = sl2.MatchList[i]
 		var sc = model.Schedule2{
-			MatchId:    c.MatchId,
 			RemainTime: c.RemainTime,
 			State:      c.MatchState,
 			HomeScore:  convToInt(c.HomeScore),
@@ -101,66 +96,12 @@ func score2(url string) {
 			AwayOT3:    convToInt(c.AwayOT3),
 			UpdateTime: time.Now().Format("2006/01/02 15:04:05"),
 		}
-		err = model.UpdateScore2(sc)
+		err = model.UpdateScore2(sc, c.MatchId)
 		if err != nil {
 			logrus.Error("篮球-数据库更新分数错误：", err)
 			return
 		}
 	}
 
-	logrus.Info("篮球-比分-变量 Mysql 更新成功！")
-
-	cost := time.Since(start)
-	fmt.Println("cost=", cost)
-	os.Exit(1)
-}
-
-func newScore2(s []interface{}) *EuropeOdds {
-	eo := &EuropeOdds{}
-
-	if len(s) > 0 {
-		eo.MatchId = int(s[0].(float64))
-	}
-
-	if len(s) > 1 {
-		eo.CompanyId = int(s[1].(float64))
-	}
-
-	if len(s) > 2 {
-		eo.HomeWinEarlyOdds = s[2].(float64)
-	}
-
-	if len(s) > 3 {
-		eo.TieEarlyOdds = s[3].(float64)
-	}
-
-	if len(s) > 4 {
-		eo.AwayWinEarlyOdds = s[4].(float64)
-	}
-
-	if len(s) > 5 {
-		eo.HomeWinMainOdds = s[5].(float64)
-	}
-
-	if len(s) > 6 {
-		eo.TieMainOdds = s[6].(float64)
-	}
-
-	if len(s) > 7 {
-		eo.AwayWinMainOdds = s[7].(float64)
-	}
-
-	if len(s) > 8 {
-		eo.ChangeTime = s[8].(string)
-	}
-
-	if len(s) > 9 {
-		eo.IsClose = s[9].(bool)
-	}
-
-	if len(s) > 10 {
-		eo.OddsType = int(s[10].(float64))
-	}
-
-	return eo
+	logrus.Info("篮球-比分-全量 Mysql 更新成功！")
 }

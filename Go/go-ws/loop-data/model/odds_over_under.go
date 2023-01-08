@@ -13,7 +13,7 @@ func OuFind(matchId int) (bool, error) {
 	db := DB.Table(table2).Where("match_id = ?", matchId).Find(&oe)
 	err := db.Error
 	if err != nil {
-		msg := fmt.Sprintf("%s 表查询失败，match_id = %d, %s", table1, oe.MatchId, err)
+		msg := fmt.Sprintf("%s 表查询失败，match_id = %d, %s", table1, matchId, err)
 		logrus.Error(msg)
 		return false, err
 	}
@@ -26,20 +26,20 @@ func OuFind(matchId int) (bool, error) {
 	return true, nil
 }
 
-func OuUpdate(oe OverUnder) error {
-	err := DB.Table(table2).Where("match_id = ?", oe.MatchId).Save(oe).Error
+func OuUpdate(oe OverUnder, matchId int) error {
+	err := DB.Table(table2).Where("match_id = ?", matchId).Save(oe).Error
 	if err != nil {
-		msg := fmt.Sprintf("%s 表更新失败，match_id = %d, %s", table1, oe.MatchId, err)
+		msg := fmt.Sprintf("%s 表更新失败，match_id = %d, %s", table1, matchId, err)
 		logrus.Error(msg)
 		return err
 	}
 	return nil
 }
 
-func OuAdd(oe OverUnder) error {
+func OuAdd(oe OverUnder, matchId int) error {
 	err := DB.Table(table2).Create(&oe).Error
 	if err != nil {
-		msg := fmt.Sprintf("%s 表添加失败，match_id = %d, %s", table1, oe.MatchId, err)
+		msg := fmt.Sprintf("%s 表添加失败，match_id = %d, %s", table1, matchId, err)
 		logrus.Error(msg)
 		return err
 	}

@@ -54,6 +54,7 @@ func odds(url string) {
 		if eo.IsClose {
 			isClose = 1
 		}
+		matchId := eo.MatchId
 		var oeNew = model.EuropeOdds{
 			MatchId:          eo.MatchId,
 			CompanyId:        eo.CompanyId,
@@ -67,17 +68,17 @@ func odds(url string) {
 			IsClose:          isClose,
 			OddsType:         eo.OddsType,
 		}
-		find, err := model.OeFind(oeNew.MatchId)
+		find, err := model.OeFind(matchId)
 		if err != nil {
 			break
 		}
 		if find {
-			err := model.OeUpdate(oeNew)
+			err := model.OeUpdate(oeNew, matchId)
 			if err != nil {
 				break
 			}
 		} else {
-			err := model.OeAdd(oeNew)
+			err := model.OeAdd(oeNew, matchId)
 			if err != nil {
 				break
 			}
@@ -93,8 +94,8 @@ func odds(url string) {
 		if ou.IsClose {
 			isClose = 1
 		}
+		matchId := ou.MatchId
 		var ouNew = model.OverUnder{
-			MatchId:            ou.MatchId,
 			CompanyId:          ou.CompanyId,
 			HandicapEarlyOdds:  ou.HandicapEarlyOdds,
 			BigBallEarlyOdds:   ou.BigBallEarlyOdds,
@@ -107,17 +108,17 @@ func odds(url string) {
 			OddsType:           ou.OddsType,
 			UpdateTime:         time.Now().Format("2006/01/02 15:04:05"),
 		}
-		find, err := model.OuFind(ouNew.MatchId)
+		find, err := model.OuFind(matchId)
 		if err != nil {
 			break
 		}
 		if find {
-			err := model.OuUpdate(ouNew)
+			err := model.OuUpdate(ouNew, matchId)
 			if err != nil {
 				break
 			}
 		} else {
-			err := model.OuAdd(ouNew)
+			err := model.OuAdd(ouNew, matchId)
 			if err != nil {
 				break
 			}

@@ -26,20 +26,20 @@ func OeFind(matchId int) (bool, error) {
 	return true, nil
 }
 
-func OeUpdate(oe EuropeOdds) error {
-	err := DB.Table(table1).Where("match_id = ?", oe.MatchId).Save(oe).Error
+func OeUpdate(oe EuropeOdds, matchId int) error {
+	err := DB.Table(table1).Where("match_id = ?", matchId).Save(oe).Error
 	if err != nil {
-		msg := fmt.Sprintf("%s 表更新失败，match_id = %d, %s", table1, oe.MatchId, err)
+		msg := fmt.Sprintf("%s 表更新失败，match_id = %d, %s", table1, matchId, err)
 		logrus.Error(msg)
 		return err
 	}
 	return nil
 }
 
-func OeAdd(oe EuropeOdds) error {
+func OeAdd(oe EuropeOdds, matchId int) error {
 	err := DB.Table(table1).Create(&oe).Error
 	if err != nil {
-		msg := fmt.Sprintf("%s 表添加失败，match_id = %d, %s", table1, oe.MatchId, err)
+		msg := fmt.Sprintf("%s 表添加失败，match_id = %d, %s", table1, matchId, err)
 		logrus.Error(msg)
 		return err
 	}

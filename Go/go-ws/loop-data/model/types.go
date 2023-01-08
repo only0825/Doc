@@ -19,7 +19,7 @@ type Schedule1 struct {
 
 // schedule 篮球表
 type Schedule2 struct {
-	MatchId    int    `json:"matchId" gorm:"column:matchId"`       // 比赛ID
+	//MatchId    int    `json:"matchId" gorm:"column:matchId"`       // 比赛ID
 	RemainTime string `json:"remainTime" gorm:"column:remainTime"` // 小节剩余时间
 	State      int    `json:"state" gorm:"column:state"`           // 比赛状态 0:未开赛 1:一节 2:二节 3:三节 4:四节  5:1OT  6:2OT  7:3OT  50:中场  -1:完场  -2:待定  -3:中断  -4:取消  -5:推迟（1OT是第一次加时赛）
 	HomeScore  int    `json:"homeScore" gorm:"column:homeScore"`   // 主队总分
@@ -61,7 +61,7 @@ type EuropeOdds struct {
 
 // hn_odds_over_under表 大小球
 type OverUnder struct {
-	MatchId            int     `json:"match_id" gorm:"column:match_id"`                           // 比赛ID
+	//MatchId            int     `json:"match_id" gorm:"column:match_id"`                           // 比赛ID
 	CompanyId          int     `json:"company_id" gorm:"column:company_id"`                       // 公司ID
 	HandicapEarlyOdds  float64 `json:"handicap_early_odds" gorm:"column:handicap_early_odds"`     // 初盘盘口赔率
 	BigBallEarlyOdds   float64 `json:"big_ball_early_odds" gorm:"column:big_ball_early_odds"`     // 初盘大球赔率
