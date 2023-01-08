@@ -21,10 +21,11 @@
     let num = 1;
 
     var ws, client_list = {}, room_id, client_id;
-    let member_id = 1000006;
-    let signature = "8bfd39783050fbc04cab793e6ca20d17";
+    let member_id = 2000078;
+    let signature = "599b3f3ca04fe5e4e75f6bb3cf473472";
+    let nickname = "预言家";
 
-    room_id = getQueryString('room_id') ? getQueryString('room_id') : 2000100;
+    room_id = getQueryString('room_id') ? getQueryString('room_id') : 2222951;
 
     function getQueryString(name) {
         var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)", "i");
@@ -36,10 +37,10 @@
     // 连接服务端
     function connect() {
         // 创建websocket
-        // ws = new WebSocket("ws://localhost:2348");
+        ws = new WebSocket("ws://localhost:2348");
         // ws = new WebSocket("ws://ws.wuhaicj.com");
         // ws = new WebSocket("ws1.qiangjinmkd.cn"); // 集群
-        ws = new WebSocket("ws://127.0.0.1:8085/socket");
+        // ws = new WebSocket("ws://127.0.0.1:8085/socket");
         // 当socket连接打开时，输入用户名
         ws.onopen = onopen;
         // 当有消息时根据消息类型显示不同信息
@@ -56,7 +57,7 @@
     // 连接建立时发送登录信息
     function onopen() {
         // 登录
-        var login_data = '{"type":"1010","device":"PC","member_id":"' + member_id + '","room_id":' + room_id + ' ,"signature":\"' + signature + '\"}';
+        var login_data = '{"type":"1010","device":"PC","nickname":"' + nickname + '","member_id":"' + member_id + '","room_id":' + room_id + ' ,"signature":\"' + signature + '\"}';
         // var login_data = '{"type":"1010","device":"PC","member_id":"","room_id":'+room_id+'}'; // 游客
         console.log("websocket握手成功，发送登录数据:" + login_data);
         ws.send(login_data);

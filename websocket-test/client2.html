@@ -19,9 +19,11 @@
 
     var ws, client_list = {}, room_id, client_id;
     // let member_id = 2000056
-    let member_id = 1000006
+    let member_id = 2000078
 
     room_id = getQueryString('room_id') ? getQueryString('room_id') : 1000020;
+
+    // room_id = getQueryString('room_id') ? getQueryString('room_id') : 506984;
 
     function getQueryString(name) {
         var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)", "i");
@@ -60,7 +62,7 @@
     // 提交对话
     function onSubmit() {
         console.log("submit")
-        ws.send('{"type":"1040","device":"PC","member_id":"' + member_id + '","msg":"Hello! Every One23!","room_id":' + room_id + '}');
+        ws.send('{"type":"1040","device":"PC","signature":"e743779ce09af22f9cb828155dd3b471","member_id":"' + member_id + '","msg":"Hello! Every One23!","room_id":' + room_id + '}');
     }
 
     // 服务端发来消息时

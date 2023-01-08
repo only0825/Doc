@@ -7,7 +7,6 @@ import (
 	"io"
 	"loop-data/configs"
 	"loop-data/model"
-	"loop-data/utils"
 	"net/http"
 	"os"
 	"time"
@@ -22,7 +21,34 @@ func (this ScoreBasketball) Run() {
 	score2(configs.Conf.ApiB.Score)
 }
 
-// 足球指数全量，只存数据库
+type ScoreList2 struct {
+	MatchList []struct {
+		MatchId       int    `json:"matchId"`
+		MatchState    int    `json:"matchState"`
+		RemainTime    string `json:"remainTime"`
+		OvertimeCount int    `json:"overtimeCount"`
+		HomeScore     string `json:"homeScore"`
+		Home1         string `json:"home1"`
+		Home2         string `json:"home2"`
+		Home3         string `json:"home3"`
+		Home4         string `json:"home4"`
+		HomeOT1       string `json:"homeOT1"`
+		HomeOT2       string `json:"homeOT2"`
+		HomeOT3       string `json:"homeOT3"`
+		AwayScore     string `json:"awayScore"`
+		Away1         string `json:"away1"`
+		Away2         string `json:"away2"`
+		Away3         string `json:"away3"`
+		Away4         string `json:"away4"`
+		AwayOT1       string `json:"awayOT1"`
+		AwayOT2       string `json:"awayOT2"`
+		AwayOT3       string `json:"awayOT3"`
+		HasStats      bool   `json:"hasStats"`
+		ExplainCn     string `json:"explainCn"`
+	} `json:"matchList"`
+}
+
+// 篮球比分全量，只存数据库
 func score2(url string) {
 	resp, err := http.Get(url)
 	if err != nil {
@@ -36,101 +62,57 @@ func score2(url string) {
 		return
 	}
 
-	fmt.Println(utils.Md5String(string(body)))
-	//fmt.Println(string(body))
-	os.Exit(1)
 	// 判断获取到的数据是否为空
 	if len(body) < 50 {
 		//logrus.Info("list value empty")
 		return
 	}
 
-	var obj Odds
-	if err = json.Unmarshal(body, &obj); err != nil {
+	var sl2 ScoreList2
+	if err = json.Unmarshal(body, &sl2); err != nil {
 		logrus.Error("json反序列化失败: ", err)
 		return
 	}
 
-	europeOdds := obj.List[0].EuropeOdds
-	for i := range europeOdds {
-		arr := europeOdds[i]
-		eo := newScore2(arr)
+	start := time.Now()
 
-		isClose := 2
-		if eo.IsClose {
-			isClose = 1
+	// 更新数据库表
+	for i := range sl2.MatchList {
+		var c = sl2.MatchList[i]
+		var sc = model.Schedule2{
+			MatchId:    c.MatchId,
+			RemainTime: c.RemainTime,
+			State:      c.MatchState,
+			HomeScore:  convToInt(c.HomeScore),
+			Home1:      convToInt(c.Home1),
+			Home2:      convToInt(c.Home2),
+			Home3:      convToInt(c.Home3),
+			Home4:      convToInt(c.Home4),
+			HomeOT1:    convToInt(c.HomeOT1),
+			HomeOT2:    convToInt(c.HomeOT2),
+			HomeOT3:    convToInt(c.HomeOT3),
+			AwayScore:  convToInt(c.AwayScore),
+			Away1:      convToInt(c.Away1),
+			Away2:      convToInt(c.Away2),
+			Away3:      convToInt(c.Away3),
+			Away4:      convToInt(c.Away4),
+			AwayOT1:    convToInt(c.AwayOT1),
+			AwayOT2:    convToInt(c.AwayOT2),
+			AwayOT3:    convToInt(c.AwayOT3),
+			UpdateTime: time.Now().Format("2006/01/02 15:04:05"),
 		}
-		var oeNew = model.EuropeOdds{
-			MatchId:          eo.MatchId,
-			CompanyId:        eo.CompanyId,
-			HomeWinEarlyOdds: eo.HomeWinEarlyOdds,
-			TieEarlyOdds:     eo.TieEarlyOdds,
-			AwayWinEarlyOdds: eo.AwayWinEarlyOdds,
-			HomeWinMainOdds:  eo.HomeWinEarlyOdds,
-			TieMainOdds:      eo.TieMainOdds,
-			AwayWinMainOdds:  eo.AwayWinMainOdds,
-			ChangeTime:       eo.ChangeTime,
-			IsClose:          isClose,
-			OddsType:         eo.OddsType,
-		}
-		find, err := model.OeFind(oeNew.MatchId)
+		err = model.UpdateScore2(sc)
 		if err != nil {
-			break
-		}
-		if find {
-			err := model.OeUpdate(oeNew)
-			if err != nil {
-				break
-			}
-		} else {
-			err := model.OeAdd(oeNew)
-			if err != nil {
-				break
-			}
+			logrus.Error("篮球-数据库更新分数错误：", err)
+			return
 		}
 	}
 
-	overUnder := obj.List[0].OverUnder
-	for i := range overUnder {
-		arr := overUnder[i]
-		ou := newOverUnder(arr)
+	logrus.Info("篮球-比分-变量 Mysql 更新成功！")
 
-		isClose := 2
-		if ou.IsClose {
-			isClose = 1
-		}
-		var ouNew = model.OverUnder{
-			MatchId:            ou.MatchId,
-			CompanyId:          ou.CompanyId,
-			HandicapEarlyOdds:  ou.HandicapEarlyOdds,
-			BigBallEarlyOdds:   ou.BigBallEarlyOdds,
-			SmallBallEarlyOdds: ou.SmallBallEarlyOdds,
-			HandicapOdds:       ou.HandicapOdds,
-			BigBallOdds:        ou.BigBallOdds,
-			SmallBallOdds:      ou.SmallBallOdds,
-			ChangeTime:         ou.ChangeTime,
-			IsClose:            isClose,
-			OddsType:           ou.OddsType,
-			UpdateTime:         time.Now().Format("2006/01/02 15:04:05"),
-		}
-		find, err := model.OuFind(ouNew.MatchId)
-		if err != nil {
-			break
-		}
-		if find {
-			err := model.OuUpdate(ouNew)
-			if err != nil {
-				break
-			}
-		} else {
-			err := model.OuAdd(ouNew)
-			if err != nil {
-				break
-			}
-		}
-	}
-
-	logrus.Info("足球-指数-全量 Mysql 存储成功！")
+	cost := time.Since(start)
+	fmt.Println("cost=", cost)
+	os.Exit(1)
 }
 
 func newScore2(s []interface{}) *EuropeOdds {

@@ -47,7 +47,7 @@ function test() {
     const md5Key = md5(key);
     const iv = md5Key.substr(0, 16);
     // 从/api/live/signurl获取到的加密字符串
-    const cipherText = 'deW54wdmNDrnRCgTeNMCTeo/Hfw8aWGrbaStBxNUKfdlvnfOr8o0y/5yq1jN3DeYWJbvWLLunPe2qhUXpmfwgcvm+iyxCUP7B4ZLtTLvj/AHigJD1y+elYn8eLn1ktmShFtwPrcDJajHfLvzL8VDaw==';
+    const cipherText = 'oDJZrCJy4/RZIPJC4hZ0hcA8ZDHhpXkJfLH990H+rC6QQRMBcIW70Wm47A0JoTb/MRzYC9jbSoBl9SLHPokWHoU3aHIgPO9a0P+fHXTwCBh4h6jtEUiPsXGcfAZBzjMVbrSyboT5Y41jkd3a7HibZQ==';
 
     let plainText = decrypt(CryptoJS.mode.CBC, cipherText, key, iv);
     console.log(plainText);

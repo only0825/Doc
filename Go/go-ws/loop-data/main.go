@@ -68,8 +68,7 @@ func main() {
 	// 篮球比分变量	Redis 1.推送数据  2.最新数据
 	c.AddJob(spec1, task.ScoreChangeBasketball{})
 	// 篮球比分全量   Mysql
-	//c.AddJob(spec1, task.ScoreBasketball{})
-
+	c.AddJob(spec2, task.ScoreBasketball{})
 	// 篮球 技术统计 （某场比赛的技术统计和球员统计） Redis
 	c.AddJob(spec3, task.StatsBasketball{})
 
