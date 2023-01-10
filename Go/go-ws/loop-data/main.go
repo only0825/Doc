@@ -51,11 +51,11 @@ func main() {
 	}
 
 	c := newWithSeconds()
-	spec1 := "*/3 * * * * ?"  // 每隔5秒执行一次
-	spec2 := "0 */1 * * * ?"  // 每隔1分钟执行一次
-	spec3 := "*/20 * * * * ?" // 每隔20秒执行一次
-	//spec4 := "0 */2 * * * ?"  // 每隔1分钟执行一次
-	spec5 := "*/6 * * * * ?" // 每隔6秒执行一次
+	spec1 := "*/8 * * * * ?"  // 每隔8秒执行一次
+	spec2 := "0 */5 * * * ?"  // 每隔5分钟执行一次
+	spec3 := "0 */6 * * * ?"  // 每隔6分执行一次
+	spec4 := "0 */4 * * * ?"  // 每隔4分钟执行一次
+	spec5 := "*/10 * * * * ?" // 每隔10秒执行一次
 
 	// 足球比分变量   Redis 1.推送数据  2.最新数据
 	c.AddJob(spec1, task.ScoreChangeFootball{})
@@ -65,10 +65,10 @@ func main() {
 	// 足球指数全量   Mysql
 	c.AddJob(spec2, task.OddsFootball{})
 
-	// 篮球比分变量	Redis 1.推送数据  2.最新数据
-	c.AddJob(spec1, task.ScoreChangeBasketball{})
+	// 篮球比分变量	Redis 1.推送数据  2.最新数据  TODO 暂时不上
+	//c.AddJob(spec1, task.ScoreChangeBasketball{})
 	// 篮球比分全量   Mysql
-	c.AddJob(spec2, task.ScoreBasketball{})
+	c.AddJob(spec4, task.ScoreBasketball{})
 	// 篮球 技术统计 （某场比赛的技术统计和球员统计） Redis
 	c.AddJob(spec3, task.StatsBasketball{})
 

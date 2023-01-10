@@ -138,12 +138,12 @@ func (s *Server) Serve(c *gin.Context) {
 				return
 			}
 			if err != nil {
-				logrus.Error("比分数据 推送失败！", err)
+				logrus.Error("足球-比分 推送失败！", err)
 				return
 			}
 
 			s.GetConnMgr().PushAll(scoreData)
-			logrus.Info("推送的比分数据成功！！！")
+			logrus.Info("足球-比分 推送成功！！！")
 		}
 	}()
 	go func() {
@@ -153,12 +153,27 @@ func (s *Server) Serve(c *gin.Context) {
 				return
 			}
 			if err != nil {
-				logrus.Error("指数数据 推送失败", err)
+				logrus.Error("足球-指数 推送失败", err)
 				return
 			}
 
 			s.GetConnMgr().PushAll(oddsData)
-			logrus.Info("推送的指数数据成功！！！")
+			logrus.Info("足球-指数 推送成功！！！")
+		}
+	}()
+	go func() {
+		for {
+			oddsData, err := task.Score()
+			if err == redis.Nil {
+				return
+			}
+			if err != nil {
+				logrus.Error("足球-指数 推送失败", err)
+				return
+			}
+
+			s.GetConnMgr().PushAll(oddsData)
+			logrus.Info("足球-指数 推送成功！！！")
 		}
 	}()
 
